@@ -1,4 +1,4 @@
-# DACN-CNTT – Hệ thống hỗ trợ học tập & cảnh báo sinh viên có nguy cơ rớt môn
+﻿# DACN-CNTT – Hệ thống hỗ trợ học tập & cảnh báo sinh viên có nguy cơ rớt môn
 
 Đồ án chuyên ngành – Công nghệ phần mềm.
 
@@ -43,7 +43,7 @@ Dừng hệ thống: `docker compose down` (dữ liệu DB vẫn giữ trong vol
 
 ## Kết nối SQL Server bằng SSMS
 
-- Server name: `localhost,1433`
+- Server name: `127.0.0.1,1433` (không dùng `localhost` vì có thể bị phân giải sang IPv6 và bị từ chối)
 - Authentication: SQL Server Authentication
 - Login: `sa` – Password: giá trị `MSSQL_SA_PASSWORD` trong `.env`
 - Tick **Trust server certificate**
