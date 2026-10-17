@@ -48,6 +48,18 @@ Dừng hệ thống: `docker compose down` (dữ liệu DB vẫn giữ trong vol
 - Login: `sa` – Password: giá trị `MSSQL_SA_PASSWORD` trong `.env`
 - Tick **Trust server certificate**
 
+## Database & migration (backend)
+
+Thiết kế CSDL: [docs/ERD.md](docs/ERD.md). Bảng được tạo bằng EF Core Code First; backend tự áp dụng migration khi khởi động.
+
+Sau khi sửa entity trong `backend/DACN.Api/Entities` hoặc `AppDbContext`, tạo migration mới (chạy trong thư mục `backend/`):
+
+```bash
+dotnet tool restore
+dotnet ef migrations add <TenMigration> --project DACN.Api
+dotnet ef database update --project DACN.Api
+```
+
 ## Quy tắc Git
 
 - `main`: bản ổn định, đang deploy. `develop`: bản tích hợp.
