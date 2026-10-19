@@ -1,9 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using DACN.Api.Auth;
 using DACN.Api.Data;
 using DACN.Api.Entities;
+using DACN.Api.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -75,10 +77,20 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
-builder.Services.AddControllers();
+// Enum (UserRole, RiskLevel, AttendanceStatus) trả về dạng chữ ("Admin", "High", "Present") thay vì số
+builder.Services.AddControllers().AddJsonOptions(options =>
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    // Mô tả tiếng Việt của từng API lấy từ comment /// trong code
+    var xmlDoc = Path.Combine(AppContext.BaseDirectory, "DACN.Api.xml");
+    if (File.Exists(xmlDoc))
+    {
+        options.IncludeXmlComments(xmlDoc);
+    }
+    options.OperationFilter<RoleDescriptionOperationFilter>();
+
     // Nút "Authorize" trên Swagger để dán token
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -100,6 +112,7 @@ using (var scope = app.Services.CreateScope())
 {
     scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
     await DbSeeder.SeedAdminAsync(scope.ServiceProvider);
+    await DbSeeder.SeedDemoUsersAsync(scope.ServiceProvider);
 }
 
 app.UseForwardedHeaders();
