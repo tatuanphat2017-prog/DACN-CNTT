@@ -48,6 +48,23 @@ Dừng hệ thống: `docker compose down` (dữ liệu DB vẫn giữ trong vol
 - Login: `sa` – Password: giá trị `MSSQL_SA_PASSWORD` trong `.env`
 - Tick **Trust server certificate**
 
+## Đăng nhập & phân quyền (JWT)
+
+- Lần chạy đầu tiên backend tự tạo tài khoản **admin** với mật khẩu `ADMIN_PASSWORD` trong `.env`.
+- `POST /api/auth/login` với `{"username": "...", "password": "..."}` → trả về `accessToken` (hết hạn sau 8 giờ) và thông tin người dùng.
+- Gọi API cần đăng nhập: gửi header `Authorization: Bearer <accessToken>`.
+- `GET /api/auth/me` → thông tin người đang đăng nhập.
+- Token chứa các claim `sub` (id), `name` (username), `role` (`Admin` | `Lecturer` | `Student`).
+- Trên Swagger: gọi login, copy `accessToken`, bấm nút **Authorize** 🔒 và dán vào.
+- Sai quá 10 lần/phút/IP → bị chặn tạm thời (HTTP 429).
+
+Chạy backend bằng F5 (Visual Studio) cần đặt thêm 2 user-secrets (chạy trong `backend/DACN.Api`):
+
+```bash
+dotnet user-secrets set "Jwt:Key" "<chuỗi ngẫu nhiên ≥ 32 ký tự, giống JWT_KEY trong .env>"
+dotnet user-secrets set "Seed:AdminPassword" "<giống ADMIN_PASSWORD trong .env>"
+```
+
 ## Database & migration (backend)
 
 Thiết kế CSDL: [docs/ERD.md](docs/ERD.md). Bảng được tạo bằng EF Core Code First; backend tự áp dụng migration khi khởi động.
