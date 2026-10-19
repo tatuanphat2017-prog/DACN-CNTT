@@ -31,7 +31,7 @@
 | `PUT` | `/api/users/{id}` | Admin | Sửa thông tin. Muốn khóa tài khoản thì đặt IsActive = false (không xóa dòng dữ liệu để giữ lịch sử). | ✅ |
 | `POST` | `/api/users/{id}/reset-password` | Admin | Đặt lại mật khẩu cho người dùng. | ✅ |
 
-## Quản trị: danh sách sinh viên, giảng viên
+## Quản trị: sinh viên, giảng viên
 
 | Method | Đường dẫn | Quyền | Mô tả | Mock |
 |---|---|---|---|---|
@@ -100,7 +100,7 @@
 | `GET` | `/api/sections/{sectionId}/grades` | Admin hoặc Lecturer | Bảng điểm cả lớp. AttendanceScore, TotalScore, IsPassed do backend tính, chỉ đọc. | ✅ |
 | `PUT` | `/api/sections/{sectionId}/grades` | Lecturer | Lưu điểm bài tập, giữa kỳ, cuối kỳ cho nhiều sinh viên cùng lúc. Điểm phải trong khoảng 0–10 (sai trả 400). Có FinalScore thì backend tự tính TotalScore và IsPassed. Trả về bảng điểm đã cập nhật. | ✅ |
 
-## Rủi ro (Machine Learning)
+## Rủi ro (ML)
 
 | Method | Đường dẫn | Quyền | Mô tả | Mock |
 |---|---|---|---|---|
@@ -127,7 +127,7 @@
 | `GET` | `/api/students/me/sections` | Student | Các lớp sinh viên đang học, kèm số buổi vắng, điểm tổng và mức rủi ro hiện tại. | ✅ |
 | `GET` | `/api/students/me/sections/{sectionId}` | Student | Chi tiết một lớp của sinh viên: các điểm thành phần, trọng số, lịch sử điểm danh. | ✅ |
 
-## Quản lý mô hình ML
+## Mô hình ML
 
 | Method | Đường dẫn | Quyền | Mô tả | Mock |
 |---|---|---|---|---|

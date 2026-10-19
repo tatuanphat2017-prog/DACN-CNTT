@@ -13,24 +13,7 @@ SPEC = "docs/api/openapi.json"
 OUT = "docs/API.md"
 METHOD_ORDER = {"get": 0, "post": 1, "put": 2, "delete": 3}
 
-# Tên nhóm hiển thị theo thứ tự (khóa = tag Swagger = tên controller)
-GROUPS = [
-    ("Auth", "Đăng nhập"),
-    ("Users", "Quản trị: tài khoản"),
-    ("People", "Quản trị: danh sách sinh viên, giảng viên"),
-    ("Departments", "Danh mục: khoa"),
-    ("Courses", "Danh mục: môn học"),
-    ("Semesters", "Danh mục: học kỳ"),
-    ("Sections", "Lớp học phần"),
-    ("Import", "Nhập Excel"),
-    ("Attendance", "Điểm danh"),
-    ("Grades", "Điểm"),
-    ("Risk", "Rủi ro (Machine Learning)"),
-    ("Warnings", "Cảnh báo"),
-    ("StudentPortal", "Cổng sinh viên"),
-    ("Ml", "Quản lý mô hình ML"),
-    ("Health", "Kiểm tra hệ thống"),
-]
+# Tên và thứ tự nhóm lấy từ danh sách "tags" trong openapi.json (cấu hình ở backend: Swagger/SwaggerTags.cs)
 
 
 def access(description: str) -> str:
@@ -70,11 +53,13 @@ def main() -> None:
         "- **Mức rủi ro:** `Low` xác suất rớt < 0.3, `Medium` 0.3–0.6, `High` > 0.6.",
         "",
     ]
-    for tag, title in GROUPS:
+    tag_order = [t["name"] for t in spec.get("tags", [])]
+    tag_order += sorted(set(by_tag) - set(tag_order))
+    for tag in tag_order:
         ops = sorted(by_tag.get(tag, []), key=lambda x: (x[1], METHOD_ORDER.get(x[0], 9)))
         if not ops:
             continue
-        lines += [f"## {title}", "", "| Method | Đường dẫn | Quyền | Mô tả | Mock |", "|---|---|---|---|---|"]
+        lines += [f"## {tag}", "", "| Method | Đường dẫn | Quyền | Mô tả | Mock |", "|---|---|---|---|---|"]
         for method, path, op in ops:
             summary = (op.get("summary") or "").replace("|", "\\|").replace("\n", " ")
             is_mock = "✅" if "**MOCK:**" in (op.get("description") or "") else ""

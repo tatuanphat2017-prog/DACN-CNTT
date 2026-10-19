@@ -38,6 +38,13 @@ public class RoleDescriptionOperationFilter : IOperationFilter
 
         if (!anonymous && auth.Count > 0)
         {
+            // Ổ khóa 🔒 trên Swagger chỉ hiện ở API cần đăng nhập
+            operation.Security ??= [];
+            operation.Security.Add(new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference("Bearer", context.Document)] = [],
+            });
+
             operation.Responses ??= new OpenApiResponses();
             operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Chưa đăng nhập hoặc token hết hạn" });
             if (roles is not null)

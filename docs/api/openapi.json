@@ -5,10 +5,1770 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/warnings": {
+      "post": {
+        "tags": [
+          "Cảnh báo"
+        ],
+        "summary": "Giảng viên gửi cảnh báo cho một sinh viên (theo EnrollmentId trong lớp mình dạy).",
+        "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendWarningRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendWarningRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendWarningRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarningItem"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarningItem"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarningItem"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/sections/{sectionId}/warnings": {
+      "get": {
+        "tags": [
+          "Cảnh báo"
+        ],
+        "summary": "Các cảnh báo đã gửi trong một lớp, mới nhất trước.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "sectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WarningItem"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WarningItem"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WarningItem"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/warnings/me": {
+      "get": {
+        "tags": [
+          "Cảnh báo"
+        ],
+        "summary": "Cảnh báo của chính sinh viên đang đăng nhập, mới nhất trước.",
+        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WarningItem"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WarningItem"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WarningItem"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/warnings/me/unread-count": {
+      "get": {
+        "tags": [
+          "Cảnh báo"
+        ],
+        "summary": "Số cảnh báo chưa đọc của sinh viên (hiện trên chuông thông báo).",
+        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCount"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCount"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnreadCount"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/warnings/{id}/read": {
+      "put": {
+        "tags": [
+          "Cảnh báo"
+        ],
+        "summary": "Sinh viên đánh dấu một cảnh báo đã đọc.",
+        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/students/me/sections": {
+      "get": {
+        "tags": [
+          "Cổng sinh viên"
+        ],
+        "summary": "Các lớp sinh viên đang học, kèm số buổi vắng, điểm tổng và mức rủi ro hiện tại.",
+        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MySectionItem"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MySectionItem"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MySectionItem"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/students/me/sections/{sectionId}": {
+      "get": {
+        "tags": [
+          "Cổng sinh viên"
+        ],
+        "summary": "Chi tiết một lớp của sinh viên: các điểm thành phần, trọng số, lịch sử điểm danh.",
+        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "sectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySectionDetail"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySectionDetail"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MySectionDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/students/me/risks": {
+      "get": {
+        "tags": [
+          "Cổng sinh viên"
+        ],
+        "summary": "Mức rủi ro của sinh viên ở từng lớp, kèm các yếu tố chính và gợi ý cải thiện.",
+        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyRisk"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyRisk"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyRisk"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Đăng nhập"
+        ],
+        "summary": "Đăng nhập bằng username (MSSV / mã GV / admin) và mật khẩu, trả về JWT.",
+        "description": "**Quyền truy cập:** Công khai, không cần đăng nhập",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "Đăng nhập"
+        ],
+        "summary": "Thông tin người đang đăng nhập (cần gửi kèm token).",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/semesters": {
+      "get": {
+        "tags": [
+          "Danh mục: học kỳ"
+        ],
+        "summary": "Danh sách học kỳ.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SemesterDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SemesterDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SemesterDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Danh mục: học kỳ"
+        ],
+        "summary": "Thêm học kỳ. Ngày kết thúc phải sau ngày bắt đầu.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSemesterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSemesterRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSemesterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/semesters/current": {
+      "get": {
+        "tags": [
+          "Danh mục: học kỳ"
+        ],
+        "summary": "Học kỳ hiện tại (IsCurrent = true).",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/semesters/{id}": {
+      "put": {
+        "tags": [
+          "Danh mục: học kỳ"
+        ],
+        "summary": "Sửa học kỳ.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSemesterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSemesterRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertSemesterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Danh mục: học kỳ"
+        ],
+        "summary": "Xóa học kỳ. Học kỳ đã mở lớp thì trả 409.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/departments": {
+      "get": {
+        "tags": [
+          "Danh mục: khoa"
+        ],
+        "summary": "Danh sách khoa.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DepartmentDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DepartmentDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DepartmentDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Danh mục: khoa"
+        ],
+        "summary": "Thêm khoa. Mã khoa trùng trả 409.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertDepartmentRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertDepartmentRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertDepartmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/departments/{id}": {
+      "put": {
+        "tags": [
+          "Danh mục: khoa"
+        ],
+        "summary": "Sửa khoa.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertDepartmentRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertDepartmentRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertDepartmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DepartmentDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Danh mục: khoa"
+        ],
+        "summary": "Xóa khoa. Còn môn học, sinh viên hoặc giảng viên thuộc khoa thì trả 409.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/courses": {
+      "get": {
+        "tags": [
+          "Danh mục: môn học"
+        ],
+        "summary": "Danh sách môn học, lọc theo khoa và từ khóa (mã hoặc tên), có phân trang.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "departmentId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDtoPagedResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDtoPagedResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDtoPagedResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Danh mục: môn học"
+        ],
+        "summary": "Thêm môn học. Mã môn trùng trả 409.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertCourseRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertCourseRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertCourseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/courses/{id}": {
+      "put": {
+        "tags": [
+          "Danh mục: môn học"
+        ],
+        "summary": "Sửa môn học.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertCourseRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertCourseRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertCourseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Danh mục: môn học"
+        ],
+        "summary": "Xóa môn học. Môn đã mở lớp thì trả 409.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/sections/{sectionId}/grades": {
+      "get": {
+        "tags": [
+          "Điểm"
+        ],
+        "summary": "Bảng điểm cả lớp. AttendanceScore, TotalScore, IsPassed do backend tính, chỉ đọc.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "sectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeSheet"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeSheet"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeSheet"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Điểm"
+        ],
+        "summary": "Lưu điểm bài tập, giữa kỳ, cuối kỳ cho nhiều sinh viên cùng lúc. Điểm phải trong khoảng 0–10 (sai trả 400).\nCó FinalScore thì backend tự tính TotalScore và IsPassed. Trả về bảng điểm đã cập nhật.",
+        "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "sectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveGradesRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveGradesRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveGradesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeSheet"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeSheet"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GradeSheet"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/sections/{sectionId}/attendance": {
       "get": {
         "tags": [
-          "Attendance"
+          "Điểm danh"
         ],
         "summary": "Tóm tắt tất cả các buổi của lớp (đủ TotalSessions buổi, buổi chưa diễn ra có Date = null).",
         "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -79,13 +1839,18 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/sections/{sectionId}/attendance/{sessionNo}": {
       "get": {
         "tags": [
-          "Attendance"
+          "Điểm danh"
         ],
         "summary": "Bảng điểm danh của một buổi: mỗi sinh viên một trạng thái (Present, Absent, Late, Excused).",
         "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -156,11 +1921,16 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
-          "Attendance"
+          "Điểm danh"
         ],
         "summary": "Lưu điểm danh một buổi (tạo mới hoặc ghi đè). Backend tự tính lại AttendanceScore, TotalScore, IsPassed của lớp.\nTrả 400 nếu có EnrollmentId không thuộc lớp.",
         "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -270,879 +2040,18 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
-      }
-    },
-    "/api/auth/login": {
-      "post": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Đăng nhập bằng username (MSSV / mã GV / admin) và mật khẩu, trả về JWT.",
-        "description": "**Quyền truy cập:** Công khai, không cần đăng nhập",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/auth/me": {
-      "get": {
-        "tags": [
-          "Auth"
-        ],
-        "summary": "Thông tin người đang đăng nhập (cần gửi kèm token).",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserInfo"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserInfo"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserInfo"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/courses": {
-      "get": {
-        "tags": [
-          "Courses"
-        ],
-        "summary": "Danh sách môn học, lọc theo khoa và từ khóa (mã hoặc tên), có phân trang.",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
+        "security": [
           {
-            "name": "departmentId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "q",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
+            "Bearer": [ ]
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseDtoPagedResult"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseDtoPagedResult"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseDtoPagedResult"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Courses"
-        ],
-        "summary": "Thêm môn học. Mã môn trùng trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertCourseRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertCourseRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertCourseRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseDto"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/courses/{id}": {
-      "put": {
-        "tags": [
-          "Courses"
-        ],
-        "summary": "Sửa môn học.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertCourseRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertCourseRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertCourseRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CourseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Courses"
-        ],
-        "summary": "Xóa môn học. Môn đã mở lớp thì trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/departments": {
-      "get": {
-        "tags": [
-          "Departments"
-        ],
-        "summary": "Danh sách khoa.",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DepartmentDto"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DepartmentDto"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/DepartmentDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Departments"
-        ],
-        "summary": "Thêm khoa. Mã khoa trùng trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertDepartmentRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertDepartmentRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertDepartmentRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/DepartmentDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DepartmentDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DepartmentDto"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/departments/{id}": {
-      "put": {
-        "tags": [
-          "Departments"
-        ],
-        "summary": "Sửa khoa.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertDepartmentRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertDepartmentRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertDepartmentRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/DepartmentDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DepartmentDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DepartmentDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Departments"
-        ],
-        "summary": "Xóa khoa. Còn môn học, sinh viên hoặc giảng viên thuộc khoa thì trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/sections/{sectionId}/grades": {
-      "get": {
-        "tags": [
-          "Grades"
-        ],
-        "summary": "Bảng điểm cả lớp. AttendanceScore, TotalScore, IsPassed do backend tính, chỉ đọc.",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "sectionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/GradeSheet"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GradeSheet"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GradeSheet"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Grades"
-        ],
-        "summary": "Lưu điểm bài tập, giữa kỳ, cuối kỳ cho nhiều sinh viên cùng lúc. Điểm phải trong khoảng 0–10 (sai trả 400).\nCó FinalScore thì backend tự tính TotalScore và IsPassed. Trả về bảng điểm đã cập nhật.",
-        "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "sectionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SaveGradesRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SaveGradesRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SaveGradesRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/GradeSheet"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GradeSheet"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GradeSheet"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
+        ]
       }
     },
     "/api/health": {
       "get": {
         "tags": [
-          "Health"
+          "Kiểm tra hệ thống"
         ],
         "description": "**Quyền truy cập:** Công khai, không cần đăng nhập",
         "responses": {
@@ -1152,580 +2061,10 @@
         }
       }
     },
-    "/api/import/students": {
-      "post": {
-        "tags": [
-          "Import"
-        ],
-        "summary": "Nhập danh sách sinh viên từ file .xlsx (gửi dạng multipart/form-data, field tên \"file\").\nCột bắt buộc: MSSV, Họ tên, Mã khoa, Lớp, Năm nhập học. Dòng lỗi được báo trong Errors, các dòng đúng vẫn được tạo.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "requestBody": {
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
-              },
-              "encoding": {
-                "file": {
-                  "style": "form"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImportResult"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImportResult"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImportResult"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/ml/models": {
-      "get": {
-        "tags": [
-          "Ml"
-        ],
-        "summary": "Danh sách các phiên bản mô hình và độ chính xác (Accuracy, Precision, Recall, F1, ROC-AUC).",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ModelVersionItem"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ModelVersionItem"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ModelVersionItem"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/ml/retrain": {
-      "post": {
-        "tags": [
-          "Ml"
-        ],
-        "summary": "Yêu cầu huấn luyện lại mô hình. Chạy nền, trả 202 ngay; xem kết quả ở GET /api/ml/models.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "responses": {
-          "202": {
-            "description": "Accepted",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/RetrainResponse"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RetrainResponse"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RetrainResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/students": {
-      "get": {
-        "tags": [
-          "People"
-        ],
-        "summary": "Danh sách sinh viên, tìm theo mã hoặc họ tên, có phân trang.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/StudentItemPagedResult"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StudentItemPagedResult"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StudentItemPagedResult"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/lecturers": {
-      "get": {
-        "tags": [
-          "People"
-        ],
-        "summary": "Danh sách giảng viên.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LecturerItem"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LecturerItem"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/LecturerItem"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/sections/{sectionId}/predict": {
-      "post": {
-        "tags": [
-          "Risk"
-        ],
-        "summary": "Chạy dự đoán cho cả lớp (gọi ML service, lưu kết quả). Sinh viên ra mức High sẽ được hệ thống tự gửi cảnh báo.\nTrả về tổng hợp số sinh viên theo từng mức rủi ro. Trả 503 nếu ML service không khả dụng.",
-        "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "sectionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/RiskSummary"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RiskSummary"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RiskSummary"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable"
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/sections/{sectionId}/risk-summary": {
-      "get": {
-        "tags": [
-          "Risk"
-        ],
-        "summary": "Tổng hợp số sinh viên theo mức rủi ro của lớp (dùng vẽ biểu đồ dashboard).",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "sectionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/RiskSummary"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RiskSummary"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RiskSummary"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/sections/{sectionId}/risks": {
-      "get": {
-        "tags": [
-          "Risk"
-        ],
-        "summary": "Kết quả dự đoán mới nhất của từng sinh viên trong lớp, lọc theo mức rủi ro, sắp xếp xác suất giảm dần.",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "sectionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "level",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/RiskLevel"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RiskItem"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RiskItem"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RiskItem"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/enrollments/{enrollmentId}/risk-history": {
-      "get": {
-        "tags": [
-          "Risk"
-        ],
-        "summary": "Lịch sử dự đoán của một sinh viên trong lớp (theo EnrollmentId), dùng vẽ biểu đồ xu hướng.",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "enrollmentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RiskHistoryPoint"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RiskHistoryPoint"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/RiskHistoryPoint"
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
     "/api/sections": {
       "get": {
         "tags": [
-          "Sections"
+          "Lớp học phần"
         ],
         "summary": "Danh sách lớp học phần, lọc theo học kỳ, môn học, có phân trang.",
         "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -1789,11 +2128,16 @@
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
-          "Sections"
+          "Lớp học phần"
         ],
         "summary": "Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -1883,13 +2227,18 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/sections/{id}": {
       "get": {
         "tags": [
-          "Sections"
+          "Lớp học phần"
         ],
         "summary": "Chi tiết một lớp học phần, kèm trọng số điểm.",
         "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -1948,11 +2297,16 @@
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
-          "Sections"
+          "Lớp học phần"
         ],
         "summary": "Sửa lớp học phần.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -2033,11 +2387,16 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       },
       "delete": {
         "tags": [
-          "Sections"
+          "Lớp học phần"
         ],
         "summary": "Xóa lớp học phần. Lớp đã có sinh viên đăng ký hoặc điểm danh thì trả 409.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -2102,13 +2461,18 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/sections/{id}/students": {
       "get": {
         "tags": [
-          "Sections"
+          "Lớp học phần"
         ],
         "summary": "Danh sách sinh viên trong lớp (kèm EnrollmentId, dùng cho điểm danh, điểm và cảnh báo).",
         "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -2179,11 +2543,16 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
-          "Sections"
+          "Lớp học phần"
         ],
         "summary": "Thêm sinh viên vào lớp. Sinh viên đã có trong lớp được bỏ qua, không báo lỗi.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -2264,13 +2633,18 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/sections/{id}/students/{enrollmentId}": {
       "delete": {
         "tags": [
-          "Sections"
+          "Lớp học phần"
         ],
         "summary": "Xóa sinh viên khỏi lớp (xóa luôn điểm danh, điểm, dự đoán rủi ro, cảnh báo của sinh viên trong lớp).",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -2324,16 +2698,21 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
-    "/api/semesters": {
+    "/api/ml/models": {
       "get": {
         "tags": [
-          "Semesters"
+          "Mô hình ML"
         ],
-        "summary": "Danh sách học kỳ.",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Danh sách các phiên bản mô hình và độ chính xác (Accuracy, Precision, Recall, F1, ROC-AUC).",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
         "responses": {
           "200": {
             "description": "OK",
@@ -2342,7 +2721,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SemesterDto"
+                    "$ref": "#/components/schemas/ModelVersionItem"
                   }
                 }
               },
@@ -2350,7 +2729,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SemesterDto"
+                    "$ref": "#/components/schemas/ModelVersionItem"
                   }
                 }
               },
@@ -2358,7 +2737,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SemesterDto"
+                    "$ref": "#/components/schemas/ModelVersionItem"
                   }
                 }
               }
@@ -2366,51 +2745,104 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
-      },
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/ml/retrain": {
       "post": {
         "tags": [
-          "Semesters"
+          "Mô hình ML"
         ],
-        "summary": "Thêm học kỳ. Ngày kết thúc phải sau ngày bắt đầu.",
+        "summary": "Yêu cầu huấn luyện lại mô hình. Chạy nền, trả 202 ngay; xem kết quả ở GET /api/ml/models.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrainResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrainResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrainResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/import/students": {
+      "post": {
+        "tags": [
+          "Nhập Excel"
+        ],
+        "summary": "Nhập danh sách sinh viên từ file .xlsx (gửi dạng multipart/form-data, field tên \"file\").\nCột bắt buộc: MSSV, Họ tên, Mã khoa, Lớp, Năm nhập học. Dòng lỗi được báo trong Errors, các dòng đúng vẫn được tạo.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UpsertSemesterRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertSemesterRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertSemesterRequest"
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "file": {
+                  "style": "form"
+                }
               }
             }
           }
         },
         "responses": {
-          "201": {
-            "description": "Created",
+          "200": {
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/SemesterDto"
+                  "$ref": "#/components/schemas/ImportResult"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SemesterDto"
+                  "$ref": "#/components/schemas/ImportResult"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SemesterDto"
+                  "$ref": "#/components/schemas/ImportResult"
                 }
               }
             }
@@ -2441,363 +2873,138 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
-    "/api/semesters/current": {
+    "/api/students": {
       "get": {
         "tags": [
-          "Semesters"
+          "Quản trị: sinh viên, giảng viên"
         ],
-        "summary": "Học kỳ hiện tại (IsCurrent = true).",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Danh sách sinh viên, tìm theo mã hoặc họ tên, có phân trang.",
+        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/SemesterDto"
+                  "$ref": "#/components/schemas/StudentItemPagedResult"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SemesterDto"
+                  "$ref": "#/components/schemas/StudentItemPagedResult"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SemesterDto"
+                  "$ref": "#/components/schemas/StudentItemPagedResult"
                 }
               }
             }
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          }
-        }
-      }
-    },
-    "/api/semesters/{id}": {
-      "put": {
-        "tags": [
-          "Semesters"
-        ],
-        "summary": "Sửa học kỳ.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertSemesterRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertSemesterRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertSemesterRequest"
-              }
-            }
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/SemesterDto"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SemesterDto"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SemesterDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
+        "security": [
+          {
+            "Bearer": [ ]
           }
-        }
-      },
-      "delete": {
+        ]
+      }
+    },
+    "/api/lecturers": {
+      "get": {
         "tags": [
-          "Semesters"
+          "Quản trị: sinh viên, giảng viên"
         ],
-        "summary": "Xóa học kỳ. Học kỳ đã mở lớp thì trả 409.",
+        "summary": "Danh sách giảng viên.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LecturerItem"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LecturerItem"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LecturerItem"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
+            "Bearer": [ ]
           }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/students/me/sections": {
-      "get": {
-        "tags": [
-          "StudentPortal"
-        ],
-        "summary": "Các lớp sinh viên đang học, kèm số buổi vắng, điểm tổng và mức rủi ro hiện tại.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MySectionItem"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MySectionItem"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MySectionItem"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/students/me/sections/{sectionId}": {
-      "get": {
-        "tags": [
-          "StudentPortal"
-        ],
-        "summary": "Chi tiết một lớp của sinh viên: các điểm thành phần, trọng số, lịch sử điểm danh.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "parameters": [
-          {
-            "name": "sectionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/MySectionDetail"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MySectionDetail"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MySectionDetail"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/students/me/risks": {
-      "get": {
-        "tags": [
-          "StudentPortal"
-        ],
-        "summary": "Mức rủi ro của sinh viên ở từng lớp, kèm các yếu tố chính và gợi ý cải thiện.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MyRisk"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MyRisk"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MyRisk"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
+        ]
       }
     },
     "/api/users": {
       "get": {
         "tags": [
-          "Users"
+          "Quản trị: tài khoản"
         ],
         "summary": "Danh sách người dùng, lọc theo role và từ khóa (username hoặc họ tên), có phân trang.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -2862,11 +3069,16 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       },
       "post": {
         "tags": [
-          "Users"
+          "Quản trị: tài khoản"
         ],
         "summary": "Tạo tài khoản. Role = Student phải có Student, Role = Lecturer phải có Lecturer. Username trùng trả 409.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -2956,13 +3168,18 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/users/{id}": {
       "get": {
         "tags": [
-          "Users"
+          "Quản trị: tài khoản"
         ],
         "summary": "Chi tiết một người dùng, kèm hồ sơ sinh viên hoặc giảng viên.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -3024,11 +3241,16 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       },
       "put": {
         "tags": [
-          "Users"
+          "Quản trị: tài khoản"
         ],
         "summary": "Sửa thông tin. Muốn khóa tài khoản thì đặt IsActive = false (không xóa dòng dữ liệu để giữ lịch sử).",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -3109,13 +3331,18 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
     "/api/users/{id}/reset-password": {
       "post": {
         "tags": [
-          "Users"
+          "Quản trị: tài khoản"
         ],
         "summary": "Đặt lại mật khẩu cho người dùng.",
         "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
@@ -3179,72 +3406,49 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
-    "/api/warnings": {
+    "/api/sections/{sectionId}/predict": {
       "post": {
         "tags": [
-          "Warnings"
+          "Rủi ro (ML)"
         ],
-        "summary": "Giảng viên gửi cảnh báo cho một sinh viên (theo EnrollmentId trong lớp mình dạy).",
+        "summary": "Chạy dự đoán cho cả lớp (gọi ML service, lưu kết quả). Sinh viên ra mức High sẽ được hệ thống tự gửi cảnh báo.\nTrả về tổng hợp số sinh viên theo từng mức rủi ro. Trả 503 nếu ML service không khả dụng.",
         "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendWarningRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendWarningRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendWarningRequest"
-              }
+        "parameters": [
+          {
+            "name": "sectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
-        },
+        ],
         "responses": {
-          "201": {
-            "description": "Created",
+          "200": {
+            "description": "OK",
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/WarningItem"
+                  "$ref": "#/components/schemas/RiskSummary"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WarningItem"
+                  "$ref": "#/components/schemas/RiskSummary"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WarningItem"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                  "$ref": "#/components/schemas/RiskSummary"
                 }
               }
             }
@@ -3269,21 +3473,29 @@
               }
             }
           },
+          "503": {
+            "description": "Service Unavailable"
+          },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
           },
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
-    "/api/sections/{sectionId}/warnings": {
+    "/api/sections/{sectionId}/risk-summary": {
       "get": {
         "tags": [
-          "Warnings"
+          "Rủi ro (ML)"
         ],
-        "summary": "Các cảnh báo đã gửi trong một lớp, mới nhất trước.",
+        "summary": "Tổng hợp số sinh viên theo mức rủi ro của lớp (dùng vẽ biểu đồ dashboard).",
         "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
         "parameters": [
           {
@@ -3302,9 +3514,89 @@
             "content": {
               "text/plain": {
                 "schema": {
+                  "$ref": "#/components/schemas/RiskSummary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskSummary"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskSummary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/sections/{sectionId}/risks": {
+      "get": {
+        "tags": [
+          "Rủi ro (ML)"
+        ],
+        "summary": "Kết quả dự đoán mới nhất của từng sinh viên trong lớp, lọc theo mức rủi ro, sắp xếp xác suất giảm dần.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "parameters": [
+          {
+            "name": "sectionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/RiskLevel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WarningItem"
+                    "$ref": "#/components/schemas/RiskItem"
                   }
                 }
               },
@@ -3312,7 +3604,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WarningItem"
+                    "$ref": "#/components/schemas/RiskItem"
                   }
                 }
               },
@@ -3320,7 +3612,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/WarningItem"
+                    "$ref": "#/components/schemas/RiskItem"
                   }
                 }
               }
@@ -3352,102 +3644,24 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     },
-    "/api/warnings/me": {
+    "/api/enrollments/{enrollmentId}/risk-history": {
       "get": {
         "tags": [
-          "Warnings"
+          "Rủi ro (ML)"
         ],
-        "summary": "Cảnh báo của chính sinh viên đang đăng nhập, mới nhất trước.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WarningItem"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WarningItem"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WarningItem"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/warnings/me/unread-count": {
-      "get": {
-        "tags": [
-          "Warnings"
-        ],
-        "summary": "Số cảnh báo chưa đọc của sinh viên (hiện trên chuông thông báo).",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnreadCount"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnreadCount"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnreadCount"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
-          }
-        }
-      }
-    },
-    "/api/warnings/{id}/read": {
-      "put": {
-        "tags": [
-          "Warnings"
-        ],
-        "summary": "Sinh viên đánh dấu một cảnh báo đã đọc.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Lịch sử dự đoán của một sinh viên trong lớp (theo EnrollmentId), dùng vẽ biểu đồ xu hướng.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
         "parameters": [
           {
-            "name": "id",
+            "name": "enrollmentId",
             "in": "path",
             "required": true,
             "schema": {
@@ -3457,8 +3671,34 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RiskHistoryPoint"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RiskHistoryPoint"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RiskHistoryPoint"
+                  }
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -3486,7 +3726,12 @@
           "403": {
             "description": "Đã đăng nhập nhưng không đủ quyền"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
       }
     }
   },
@@ -4978,56 +5223,51 @@
       }
     }
   },
-  "security": [
-    {
-      "Bearer": [ ]
-    }
-  ],
   "tags": [
     {
-      "name": "Attendance"
+      "name": "Đăng nhập"
     },
     {
-      "name": "Auth"
+      "name": "Quản trị: tài khoản"
     },
     {
-      "name": "Courses"
+      "name": "Quản trị: sinh viên, giảng viên"
     },
     {
-      "name": "Departments"
+      "name": "Danh mục: khoa"
     },
     {
-      "name": "Grades"
+      "name": "Danh mục: môn học"
     },
     {
-      "name": "Health"
+      "name": "Danh mục: học kỳ"
     },
     {
-      "name": "Import"
+      "name": "Lớp học phần"
     },
     {
-      "name": "Ml"
+      "name": "Nhập Excel"
     },
     {
-      "name": "People"
+      "name": "Điểm danh"
     },
     {
-      "name": "Risk"
+      "name": "Điểm"
     },
     {
-      "name": "Sections"
+      "name": "Rủi ro (ML)"
     },
     {
-      "name": "Semesters"
+      "name": "Cảnh báo"
     },
     {
-      "name": "StudentPortal"
+      "name": "Cổng sinh viên"
     },
     {
-      "name": "Users"
+      "name": "Mô hình ML"
     },
     {
-      "name": "Warnings"
+      "name": "Kiểm tra hệ thống"
     }
   ]
 }

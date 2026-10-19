@@ -99,10 +99,11 @@ builder.Services.AddSwaggerGen(options =>
         BearerFormat = "JWT",
         Description = "Gọi POST /api/auth/login, copy accessToken rồi dán vào đây (không cần gõ chữ Bearer).",
     });
-    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-    {
-        [new OpenApiSecuritySchemeReference("Bearer", document)] = [],
-    });
+    // Ổ khóa chỉ gắn cho API có [Authorize] (xem RoleDescriptionOperationFilter), không gắn chung cho cả trang
+
+    // Nhóm API trên Swagger đặt tên tiếng Việt, đúng thứ tự trong SwaggerTags.Order
+    options.TagActionsBy(api => [SwaggerTags.For(api.ActionDescriptor.RouteValues["controller"])]);
+    options.DocumentFilter<TagOrderDocumentFilter>();
 });
 
 var app = builder.Build();
