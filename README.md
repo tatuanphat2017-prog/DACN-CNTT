@@ -65,6 +65,24 @@ dotnet user-secrets set "Jwt:Key" "<chuỗi ngẫu nhiên ≥ 32 ký tự, giố
 dotnet user-secrets set "Seed:AdminPassword" "<giống ADMIN_PASSWORD trong .env>"
 ```
 
+## API cho Frontend
+
+- Swagger (xem và gọi thử): http://localhost:8080/swagger — nút **Authorize** để dán token.
+- Bảng tóm tắt 51 endpoint, quyền của từng role: [docs/API.md](docs/API.md).
+- Đặc tả OpenAPI: [docs/api/openapi.json](docs/api/openapi.json) (có thể dùng sinh kiểu TypeScript, ví dụ `npx openapi-typescript docs/api/openapi.json -o src/api/schema.d.ts`).
+- Phần lớn API đang **MOCK**: trả dữ liệu mẫu cố định (response có header `X-Mock-Data: true`, Swagger ghi rõ). Backend sẽ thay dần bằng logic thật, **hình dạng dữ liệu giữ nguyên** nên Frontend không phải sửa.
+- Dữ liệu mẫu: lớp `IT001.01` có 8 sinh viên với đủ 3 mức rủi ro (4 Low, 2 Medium, 2 High).
+
+**Tài khoản để thử từng role** (đặt `DEMO_PASSWORD` trong `.env` để tự tạo):
+
+| Role | Username | Mật khẩu |
+|---|---|---|
+| Admin | `admin` | `ADMIN_PASSWORD` |
+| Giảng viên | `GV001`, `GV002` | `DEMO_PASSWORD` |
+| Sinh viên | `SV001` … `SV008` | `DEMO_PASSWORD` |
+
+Với dữ liệu mẫu, mọi sinh viên đều nhận dữ liệu của `SV002` ở các API `/api/students/me/*`.
+
 ## Database & migration (backend)
 
 Thiết kế CSDL: [docs/ERD.md](docs/ERD.md). Bảng được tạo bằng EF Core Code First; backend tự áp dụng migration khi khởi động.
