@@ -83,6 +83,10 @@ dotnet user-secrets set "Seed:AdminPassword" "<giống ADMIN_PASSWORD trong .env
 
 > Dữ liệu demo chỉ được tạo khi database **chưa có lớp học phần nào**. Nếu database cũ đã có dữ liệu thử và muốn tạo lại dữ liệu demo mới: `docker compose down -v` (⚠️ xóa toàn bộ database dev trong Docker) rồi `docker compose up -d --build`.
 
+## ML service (dự đoán nguy cơ rớt môn)
+
+Service Python (FastAPI) trong [ml-service/](ml-service/README.md): dự đoán xác suất rớt môn từ 5 đặc trưng chụp ở giữa kỳ, kèm lời giải thích. So sánh thuật toán và biểu đồ: [docs/ml/model_comparison.md](docs/ml/model_comparison.md). Chạy test: `cd ml-service && pip install -r requirements-dev.txt && pytest tests -q`.
+
 ## Database & migration (backend)
 
 Thiết kế CSDL: [docs/ERD.md](docs/ERD.md). Bảng được tạo bằng EF Core Code First; backend tự áp dụng migration khi khởi động.

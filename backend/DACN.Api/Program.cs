@@ -78,6 +78,7 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<SectionAccessService>();
 builder.Services.AddScoped<GpaService>();
 builder.Services.AddScoped<GradingService>();
+builder.Services.AddScoped<MlFeatureService>();
 
 // Chống dò mật khẩu: tối đa 10 lần đăng nhập mỗi phút cho mỗi IP
 builder.Services.AddRateLimiter(options =>
