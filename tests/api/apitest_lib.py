@@ -6,6 +6,7 @@ Yêu cầu: hệ thống đang chạy (docker compose up -d), có file .env ở 
 import io
 import json
 import os
+import time
 from pathlib import Path
 import urllib.error
 import urllib.request
@@ -41,8 +42,13 @@ def call(method, path, body=None, token=None, raw=None, content_type=None):
 
 
 def login(username, password):
-    status, body, _ = call("POST", "/auth/login", {"username": username, "password": password})
-    return body["accessToken"] if status == 200 else None
+    """Đăng nhập, trả token hoặc None nếu sai thông tin. Backend giới hạn 10 lần đăng nhập/phút/IP (429) nên tự chờ và thử lại."""
+    for _ in range(15):
+        status, body, _ = call("POST", "/auth/login", {"username": username, "password": password})
+        if status != 429:
+            return body["accessToken"] if status == 200 else None
+        time.sleep(5)
+    raise RuntimeError("Đăng nhập liên tục bị giới hạn tốc độ (429)")
 
 
 def multipart(field, filename, content, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"):

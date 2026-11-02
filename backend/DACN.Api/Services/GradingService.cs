@@ -22,9 +22,9 @@ public static class ScoreCalculator
     /// Chưa điểm danh buổi nào thì null. Khi điểm danh đủ TotalSessions buổi, đây chính là công thức cuối kỳ.
     /// </summary>
     public static decimal? AttendanceScore(AttendanceCounts counts) =>
-        counts.Total == 0 ? null : Math.Round(10m * (counts.Present + 0.5m * counts.Late + counts.Excused) / counts.Total, 2);
+        counts.Total == 0 ? null : Math.Round(10m * (counts.Present + 0.5m * counts.Late + counts.Excused) / counts.Total, 2, MidpointRounding.AwayFromZero);
 
-    /// <summary>Điểm tổng = tổng (điểm thành phần × trọng số), làm tròn 1 chữ số. Thiếu bất kỳ điểm nào thì null.</summary>
+    /// <summary>Điểm tổng = tổng (điểm thành phần × trọng số), làm tròn 1 chữ số theo kiểu "nửa lên" (7.25 → 7.3). Thiếu bất kỳ điểm nào thì null.</summary>
     public static decimal? TotalScore(decimal? attendance, decimal? assignment, decimal? midterm, decimal? final, SectionWeights w)
     {
         if (attendance is null || assignment is null || midterm is null || final is null)
@@ -33,7 +33,7 @@ public static class ScoreCalculator
         }
         return Math.Round(
             attendance.Value * w.AttendanceWeight + assignment.Value * w.AssignmentWeight
-            + midterm.Value * w.MidtermWeight + final.Value * w.FinalWeight, 1);
+            + midterm.Value * w.MidtermWeight + final.Value * w.FinalWeight, 1, MidpointRounding.AwayFromZero);
     }
 
     /// <summary>Qua môn khi điểm tổng ≥ 4.0 và số buổi vắng (Absent) ≤ 20% tổng số buổi. Chưa có điểm tổng thì null.</summary>

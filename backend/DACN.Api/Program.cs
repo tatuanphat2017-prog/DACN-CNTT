@@ -22,8 +22,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("Default"),
         sql => sql.EnableRetryOnFailure()));
 
-builder.Services.AddHttpClient("ml", client =>
-    client.BaseAddress = new Uri(builder.Configuration["MlService:BaseUrl"] ?? "http://localhost:8000"));
+builder.Services.AddHttpClient<IMlClient, MlClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["MlService:BaseUrl"] ?? "http://localhost:8000");
+    client.Timeout = TimeSpan.FromSeconds(builder.Configuration.GetValue("MlService:TimeoutSeconds", 120));
+    var apiKey = builder.Configuration["MlService:ApiKey"];
+    if (!string.IsNullOrEmpty(apiKey))
+    {
+        client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
+    }
+});
 
 builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy => policy
@@ -79,6 +87,10 @@ builder.Services.AddScoped<SectionAccessService>();
 builder.Services.AddScoped<GpaService>();
 builder.Services.AddScoped<GradingService>();
 builder.Services.AddScoped<MlFeatureService>();
+builder.Services.AddScoped<MlModelService>();
+builder.Services.AddScoped<RiskService>();
+builder.Services.AddSingleton<RetrainJob>();
+builder.Services.AddHostedService(sp => sp.GetRequiredService<RetrainJob>());
 
 // Chống dò mật khẩu: tối đa 10 lần đăng nhập mỗi phút cho mỗi IP
 builder.Services.AddRateLimiter(options =>

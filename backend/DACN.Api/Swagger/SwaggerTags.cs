@@ -22,6 +22,7 @@ public static class SwaggerTags
         ("Warnings", "Cảnh báo"),
         ("StudentPortal", "Cổng sinh viên"),
         ("Ml", "Mô hình ML"),
+        ("MlData", "Mô hình ML"),
         ("Health", "Kiểm tra hệ thống"),
     ];
 
@@ -33,5 +34,5 @@ public static class SwaggerTags
 public class TagOrderDocumentFilter : IDocumentFilter
 {
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context) =>
-        swaggerDoc.Tags = new HashSet<OpenApiTag>(SwaggerTags.Order.Select(x => new OpenApiTag { Name = x.Tag }));
+        swaggerDoc.Tags = new HashSet<OpenApiTag>(SwaggerTags.Order.Select(x => x.Tag).Distinct().Select(name => new OpenApiTag { Name = name }));
 }

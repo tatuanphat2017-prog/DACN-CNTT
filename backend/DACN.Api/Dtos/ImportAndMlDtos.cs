@@ -10,3 +10,6 @@ public record ModelVersionItem(
     DateTime TrainedAt, bool IsActive);
 
 public record RetrainResponse(string Status, string Message);
+
+/// <summary>Trạng thái lần huấn luyện lại gần nhất. Status: Idle (chưa chạy), Running, Succeeded, Failed.</summary>
+public record RetrainStatusDto(string Status, string? Message, DateTime? StartedAt, DateTime? FinishedAt, string? Version, bool? Activated);

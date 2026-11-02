@@ -15,12 +15,25 @@ sv90 = login("SV090", ENV["DEMO_PASSWORD"])      # khóa 2025: sinh viên mới
 assert admin and gv1 and sv1 and sv90, "Không đăng nhập được tài khoản demo"
 
 print("== Quy mô dữ liệu ==")
-users = call("GET", "/users?pageSize=1", token=admin)[1]["totalItems"]
-students = call("GET", "/users?role=Student&pageSize=1", token=admin)[1]["totalItems"]
-lecturers = call("GET", "/users?role=Lecturer&pageSize=1", token=admin)[1]["totalItems"]
-check("Tổng tài khoản = 1 admin + 6 giảng viên + 120 sinh viên", 127, users)
-check("120 sinh viên", 120, students)
-check("6 giảng viên", 6, lecturers)
+import re
+
+
+def all_users(role):
+    out, page = [], 1
+    while True:
+        body = call("GET", f"/users?role={role}&pageSize=100&page={page}", token=admin)[1]
+        out += body["items"]
+        if len(out) >= body["totalItems"]:
+            return out
+        page += 1
+
+
+# Chỉ đếm đúng tài khoản demo (database có thể còn tài khoản thử từ các test khác)
+demo_students = [u for u in all_users("Student") if re.fullmatch(r"SV\d{3}", u["username"]) and u["isActive"]]
+demo_lecturers = [u for u in all_users("Lecturer") if re.fullmatch(r"GV\d{3}", u["username"]) and u["isActive"]]
+check("120 sinh viên demo SV001–SV120", [f"SV{i:03d}" for i in range(1, 121)], sorted(u["username"] for u in demo_students))
+check("6 giảng viên demo GV001–GV006", [f"GV{i:03d}" for i in range(1, 7)], sorted(u["username"] for u in demo_lecturers))
+check("Có tài khoản admin", True, any(u["username"] == "admin" for u in call("GET", "/users?role=Admin", token=admin)[1]["items"]))
 check("16 môn học", 16, call("GET", "/courses?pageSize=100", token=admin)[1]["totalItems"])
 sems = call("GET", "/semesters", token=admin)[1]
 check("3 học kỳ", 3, len(sems))

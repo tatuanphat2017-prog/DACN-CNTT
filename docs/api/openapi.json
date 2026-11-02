@@ -10,8 +10,8 @@
         "tags": [
           "Cảnh báo"
         ],
-        "summary": "Giảng viên gửi cảnh báo cho một sinh viên (theo EnrollmentId trong lớp mình dạy).",
-        "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Giảng viên gửi cảnh báo cho một sinh viên (theo EnrollmentId trong lớp mình dạy). Nội dung tối đa 1000 ký tự.",
+        "description": "**Quyền truy cập:** Role Lecturer",
         "requestBody": {
           "content": {
             "application/json": {
@@ -72,6 +72,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -94,9 +114,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -111,8 +128,8 @@
         "tags": [
           "Cảnh báo"
         ],
-        "summary": "Các cảnh báo đã gửi trong một lớp, mới nhất trước.",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Các cảnh báo trong một lớp (của giảng viên và của hệ thống), mới nhất trước.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer",
         "parameters": [
           {
             "name": "sectionId",
@@ -154,6 +171,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -176,9 +213,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -194,7 +228,7 @@
           "Cảnh báo"
         ],
         "summary": "Cảnh báo của chính sinh viên đang đăng nhập, mới nhất trước.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Student",
         "responses": {
           "200": {
             "description": "OK",
@@ -245,7 +279,7 @@
           "Cảnh báo"
         ],
         "summary": "Số cảnh báo chưa đọc của sinh viên (hiện trên chuông thông báo).",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Student",
         "responses": {
           "200": {
             "description": "OK",
@@ -286,8 +320,8 @@
         "tags": [
           "Cảnh báo"
         ],
-        "summary": "Sinh viên đánh dấu một cảnh báo đã đọc.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Sinh viên đánh dấu một cảnh báo của mình là đã đọc (gọi lại nhiều lần không sao). Cảnh báo của người khác trả 404.",
+        "description": "**Quyền truy cập:** Role Student",
         "parameters": [
           {
             "name": "id",
@@ -342,8 +376,8 @@
         "tags": [
           "Cổng sinh viên"
         ],
-        "summary": "Các lớp sinh viên đang học, kèm số buổi vắng, điểm tổng và mức rủi ro hiện tại.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Các lớp sinh viên đang học (mới nhất trước), kèm số buổi vắng, điểm tổng và mức rủi ro hiện tại.",
+        "description": "**Quyền truy cập:** Role Student",
         "responses": {
           "200": {
             "description": "OK",
@@ -393,8 +427,8 @@
         "tags": [
           "Cổng sinh viên"
         ],
-        "summary": "Chi tiết một lớp của sinh viên: các điểm thành phần, trọng số, lịch sử điểm danh.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Chi tiết một lớp của sinh viên: các điểm thành phần, trọng số, lịch sử điểm danh. Lớp không đăng ký trả 404.",
+        "description": "**Quyền truy cập:** Role Student",
         "parameters": [
           {
             "name": "sectionId",
@@ -466,8 +500,8 @@
         "tags": [
           "Cổng sinh viên"
         ],
-        "summary": "Mức rủi ro của sinh viên ở từng lớp, kèm các yếu tố chính và gợi ý cải thiện.",
-        "description": "**Quyền truy cập:** Role Student\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Mức rủi ro của sinh viên ở từng lớp (kết quả dự đoán mới nhất), kèm các yếu tố chính và gợi ý cải thiện. Xác suất cao trước.\r\nLớp chưa được dự đoán thì không có trong danh sách.",
+        "description": "**Quyền truy cập:** Role Student",
         "responses": {
           "200": {
             "description": "OK",
@@ -638,13 +672,74 @@
         ]
       }
     },
+    "/api/auth/change-password": {
+      "post": {
+        "tags": [
+          "Đăng nhập"
+        ],
+        "summary": "Đổi mật khẩu của chính mình. Sai mật khẩu hiện tại trả 400.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/semesters": {
       "get": {
         "tags": [
           "Danh mục: học kỳ"
         ],
-        "summary": "Danh sách học kỳ.",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Danh sách học kỳ, mới nhất trước.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
         "responses": {
           "200": {
             "description": "OK",
@@ -689,8 +784,8 @@
         "tags": [
           "Danh mục: học kỳ"
         ],
-        "summary": "Thêm học kỳ. Ngày kết thúc phải sau ngày bắt đầu.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Thêm học kỳ. Ngày kết thúc phải sau ngày bắt đầu. Đặt IsCurrent = true sẽ tự bỏ cờ của học kỳ khác.",
+        "description": "**Quyền truy cập:** Role Admin",
         "requestBody": {
           "content": {
             "application/json": {
@@ -770,8 +865,8 @@
         "tags": [
           "Danh mục: học kỳ"
         ],
-        "summary": "Học kỳ hiện tại (IsCurrent = true).",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Học kỳ hiện tại (IsCurrent = true). Chưa đặt học kỳ nào thì trả 404.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
         "responses": {
           "200": {
             "description": "OK",
@@ -793,6 +888,26 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
           }
@@ -810,7 +925,7 @@
           "Danh mục: học kỳ"
         ],
         "summary": "Sửa học kỳ.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -862,6 +977,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -900,7 +1035,7 @@
           "Danh mục: học kỳ"
         ],
         "summary": "Xóa học kỳ. Học kỳ đã mở lớp thì trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -976,7 +1111,7 @@
           "Danh mục: khoa"
         ],
         "summary": "Danh sách khoa.",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
         "responses": {
           "200": {
             "description": "OK",
@@ -1022,7 +1157,7 @@
           "Danh mục: khoa"
         ],
         "summary": "Thêm khoa. Mã khoa trùng trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1103,7 +1238,7 @@
           "Danh mục: khoa"
         ],
         "summary": "Sửa khoa.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -1175,6 +1310,26 @@
               }
             }
           },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
           },
@@ -1193,7 +1348,7 @@
           "Danh mục: khoa"
         ],
         "summary": "Xóa khoa. Còn môn học, sinh viên hoặc giảng viên thuộc khoa thì trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -1269,7 +1424,7 @@
           "Danh mục: môn học"
         ],
         "summary": "Danh sách môn học, lọc theo khoa và từ khóa (mã hoặc tên), có phân trang.",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
         "parameters": [
           {
             "name": "departmentId",
@@ -1340,8 +1495,8 @@
         "tags": [
           "Danh mục: môn học"
         ],
-        "summary": "Thêm môn học. Mã môn trùng trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Thêm môn học. Mã môn trùng trả 409, khoa không tồn tại trả 400.",
+        "description": "**Quyền truy cập:** Role Admin",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1378,6 +1533,26 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CourseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
                 }
               }
             }
@@ -1422,7 +1597,7 @@
           "Danh mục: môn học"
         ],
         "summary": "Sửa môn học.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -1474,8 +1649,48 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1512,7 +1727,7 @@
           "Danh mục: môn học"
         ],
         "summary": "Xóa môn học. Môn đã mở lớp thì trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -1588,7 +1803,7 @@
           "Điểm"
         ],
         "summary": "Bảng điểm cả lớp. AttendanceScore, TotalScore, IsPassed do backend tính, chỉ đọc.",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer",
         "parameters": [
           {
             "name": "sectionId",
@@ -1621,6 +1836,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1643,9 +1878,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -1658,8 +1890,8 @@
         "tags": [
           "Điểm"
         ],
-        "summary": "Lưu điểm bài tập, giữa kỳ, cuối kỳ cho nhiều sinh viên cùng lúc. Điểm phải trong khoảng 0–10 (sai trả 400).\nCó FinalScore thì backend tự tính TotalScore và IsPassed. Trả về bảng điểm đã cập nhật.",
-        "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Lưu điểm bài tập, giữa kỳ, cuối kỳ cho nhiều sinh viên cùng lúc. Điểm trong khoảng 0–10 (sai trả 400); điểm null nghĩa là giữ nguyên.\r\nCó đủ điểm thì backend tự tính TotalScore và IsPassed. Trả 400 nếu EnrollmentId không thuộc lớp hoặc trùng nhau.\r\nTrả về bảng điểm đã cập nhật.",
+        "description": "**Quyền truy cập:** Role Lecturer",
         "parameters": [
           {
             "name": "sectionId",
@@ -1731,6 +1963,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1753,9 +2005,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -1770,8 +2019,8 @@
         "tags": [
           "Điểm danh"
         ],
-        "summary": "Tóm tắt tất cả các buổi của lớp (đủ TotalSessions buổi, buổi chưa diễn ra có Date = null).",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Tóm tắt tất cả các buổi của lớp (đủ TotalSessions buổi, buổi chưa điểm danh có Date = null).",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer",
         "parameters": [
           {
             "name": "sectionId",
@@ -1813,6 +2062,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1835,9 +2104,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -1852,8 +2118,8 @@
         "tags": [
           "Điểm danh"
         ],
-        "summary": "Bảng điểm danh của một buổi: mỗi sinh viên một trạng thái (Present, Absent, Late, Excused).",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Bảng điểm danh của một buổi: mỗi sinh viên một trạng thái (Present, Absent, Late, Excused). Buổi chưa điểm danh mặc định tất cả Present.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer",
         "parameters": [
           {
             "name": "sectionId",
@@ -1895,6 +2161,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1917,9 +2203,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -1932,8 +2215,8 @@
         "tags": [
           "Điểm danh"
         ],
-        "summary": "Lưu điểm danh một buổi (tạo mới hoặc ghi đè). Backend tự tính lại AttendanceScore, TotalScore, IsPassed của lớp.\nTrả 400 nếu có EnrollmentId không thuộc lớp.",
-        "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Lưu điểm danh một buổi (tạo mới hoặc ghi đè). Sinh viên không có trong Marks được ghi mặc định Present.\r\nBackend tự tính lại AttendanceScore, TotalScore, IsPassed của cả lớp. Trả 400 nếu có EnrollmentId không thuộc lớp\r\nhoặc trùng nhau; 404 nếu số buổi ngoài khoảng 1 đến TotalSessions.",
+        "description": "**Quyền truy cập:** Role Lecturer",
         "parameters": [
           {
             "name": "sectionId",
@@ -2014,6 +2297,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -2036,9 +2339,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -2053,6 +2353,7 @@
         "tags": [
           "Kiểm tra hệ thống"
         ],
+        "summary": "Kiểm tra backend, database và ML service có kết nối được không.",
         "description": "**Quyền truy cập:** Công khai, không cần đăng nhập",
         "responses": {
           "200": {
@@ -2066,8 +2367,8 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Danh sách lớp học phần, lọc theo học kỳ, môn học, có phân trang.",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Danh sách lớp học phần, lọc theo học kỳ, môn học, có phân trang. Học kỳ mới nhất trước.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
         "parameters": [
           {
             "name": "semesterId",
@@ -2139,8 +2440,8 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409; môn, học kỳ, giảng viên không tồn tại trả 400.",
+        "description": "**Quyền truy cập:** Role Admin",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2240,8 +2541,8 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Chi tiết một lớp học phần, kèm trọng số điểm.",
-        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Chi tiết một lớp học phần, kèm trọng số điểm. Giảng viên chỉ xem lớp mình dạy, sinh viên chỉ xem lớp mình học (sai trả 403).",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
         "parameters": [
           {
             "name": "id",
@@ -2270,6 +2571,26 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SectionDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -2308,8 +2629,8 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Sửa lớp học phần.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Sửa lớp học phần. Không giảm tổng số buổi xuống thấp hơn số buổi đã điểm danh.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -2361,8 +2682,48 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2398,8 +2759,8 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Xóa lớp học phần. Lớp đã có sinh viên đăng ký hoặc điểm danh thì trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Xóa lớp học phần. Lớp còn sinh viên đăng ký thì trả 409 (xóa hết sinh viên khỏi lớp trước). Các buổi điểm danh còn sót được xóa theo.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -2474,8 +2835,8 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Danh sách sinh viên trong lớp (kèm EnrollmentId, dùng cho điểm danh, điểm và cảnh báo).",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Danh sách sinh viên trong lớp (kèm EnrollmentId, dùng cho điểm danh, điểm và cảnh báo). Giảng viên chỉ xem lớp mình dạy.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer",
         "parameters": [
           {
             "name": "id",
@@ -2517,6 +2878,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -2539,9 +2920,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -2554,8 +2932,8 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Thêm sinh viên vào lớp. Sinh viên đã có trong lớp được bỏ qua, không báo lỗi.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Thêm sinh viên vào lớp. Sinh viên đã có trong lớp được bỏ qua, không báo lỗi. Id không tồn tại hoặc bị khóa trả 400.\r\nPriorGpa của từng sinh viên được tính tự động từ các học kỳ đã kết thúc trước học kỳ của lớp.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -2607,6 +2985,26 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -2647,7 +3045,7 @@
           "Lớp học phần"
         ],
         "summary": "Xóa sinh viên khỏi lớp (xóa luôn điểm danh, điểm, dự đoán rủi ro, cảnh báo của sinh viên trong lớp).",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -2711,8 +3109,8 @@
         "tags": [
           "Mô hình ML"
         ],
-        "summary": "Danh sách các phiên bản mô hình và độ chính xác (Accuracy, Precision, Recall, F1, ROC-AUC).",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Danh sách các phiên bản mô hình và độ chính xác (Accuracy, Precision, Recall, F1, ROC-AUC), mới nhất trước.\r\nTự đồng bộ từ ML service; nếu ML service không khả dụng thì trả dữ liệu đã lưu trong database.",
+        "description": "**Quyền truy cập:** Role Admin",
         "responses": {
           "200": {
             "description": "OK",
@@ -2762,8 +3160,8 @@
         "tags": [
           "Mô hình ML"
         ],
-        "summary": "Yêu cầu huấn luyện lại mô hình. Chạy nền, trả 202 ngay; xem kết quả ở GET /api/ml/models.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Yêu cầu huấn luyện lại mô hình bằng dữ liệu thật trong database. Chạy nền, trả 202 ngay;\r\ntheo dõi ở GET /api/ml/retrain/status, phiên bản mới xuất hiện trong GET /api/ml/models.\r\nMô hình mới được dùng ngay nếu ROC-AUC không kém mô hình hiện tại quá 0.01. Đang huấn luyện thì trả 409.",
+        "description": "**Quyền truy cập:** Role Admin",
         "responses": {
           "202": {
             "description": "Accepted",
@@ -2781,6 +3179,195 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RetrainResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/ml/retrain/status": {
+      "get": {
+        "tags": [
+          "Mô hình ML"
+        ],
+        "summary": "Trạng thái lần huấn luyện lại gần nhất (Idle, Running, Succeeded, Failed) kèm thông báo kết quả.",
+        "description": "**Quyền truy cập:** Role Admin",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrainStatusDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrainStatusDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrainStatusDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/ml/models/{id}/activate": {
+      "post": {
+        "tags": [
+          "Mô hình ML"
+        ],
+        "summary": "Chuyển sang dùng một phiên bản mô hình đã lưu. Trả 404 nếu không có phiên bản đó, 503 nếu ML service không khả dụng.",
+        "description": "**Quyền truy cập:** Role Admin",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelVersionItem"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelVersionItem"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelVersionItem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable"
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/ml/training-data": {
+      "get": {
+        "tags": [
+          "Mô hình ML"
+        ],
+        "summary": "Dữ liệu huấn luyện lấy từ các đăng ký đã có kết quả cuối kỳ: đặc trưng chụp ở giữa kỳ và nhãn Failed.\r\nKhông chứa thông tin định danh sinh viên (chỉ EnrollmentId). Script ml-service/scripts/export_training_data.py dùng API này.",
+        "description": "**Quyền truy cập:** Role Admin",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrainingRow"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrainingRow"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrainingRow"
+                  }
                 }
               }
             }
@@ -2804,8 +3391,8 @@
         "tags": [
           "Nhập Excel"
         ],
-        "summary": "Nhập danh sách sinh viên từ file .xlsx (gửi dạng multipart/form-data, field tên \"file\").\nCột bắt buộc: MSSV, Họ tên, Mã khoa, Lớp, Năm nhập học. Dòng lỗi được báo trong Errors, các dòng đúng vẫn được tạo.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Nhập danh sách sinh viên từ file .xlsx (gửi dạng multipart/form-data, field tên \"file\", tối đa 5MB và 500 dòng).\r\nDòng đầu là tiêu đề, cột bắt buộc: MSSV, Họ tên, Mã khoa, Lớp, Năm nhập học (cột Email tùy chọn).\r\nMỗi dòng tạo một tài khoản sinh viên với username = MSSV. Mật khẩu ban đầu là cấu hình Import:DefaultPassword,\r\nnếu không cấu hình thì bằng chính MSSV (nên đổi sau). Dòng lỗi được báo trong Errors, các dòng đúng vẫn được tạo.",
+        "description": "**Quyền truy cập:** Role Admin",
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -2886,8 +3473,8 @@
         "tags": [
           "Quản trị: sinh viên, giảng viên"
         ],
-        "summary": "Danh sách sinh viên, tìm theo mã hoặc họ tên, có phân trang.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Danh sách sinh viên đang hoạt động, tìm theo mã hoặc họ tên, có phân trang.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "q",
@@ -2955,8 +3542,8 @@
         "tags": [
           "Quản trị: sinh viên, giảng viên"
         ],
-        "summary": "Danh sách giảng viên.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Danh sách giảng viên đang hoạt động.",
+        "description": "**Quyền truy cập:** Role Admin",
         "responses": {
           "200": {
             "description": "OK",
@@ -3006,8 +3593,8 @@
         "tags": [
           "Quản trị: tài khoản"
         ],
-        "summary": "Danh sách người dùng, lọc theo role và từ khóa (username hoặc họ tên), có phân trang.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Danh sách người dùng, lọc theo role và từ khóa (username, họ tên hoặc email), có phân trang.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "role",
@@ -3080,8 +3667,8 @@
         "tags": [
           "Quản trị: tài khoản"
         ],
-        "summary": "Tạo tài khoản. Role = Student phải có Student, Role = Lecturer phải có Lecturer. Username trùng trả 409.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Tạo tài khoản. Role = Student phải có Student, Role = Lecturer phải có Lecturer. Username, email, mã sinh viên, mã giảng viên trùng trả 409.",
+        "description": "**Quyền truy cập:** Role Admin",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3182,7 +3769,7 @@
           "Quản trị: tài khoản"
         ],
         "summary": "Chi tiết một người dùng, kèm hồ sơ sinh viên hoặc giảng viên.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -3252,8 +3839,8 @@
         "tags": [
           "Quản trị: tài khoản"
         ],
-        "summary": "Sửa thông tin. Muốn khóa tài khoản thì đặt IsActive = false (không xóa dòng dữ liệu để giữ lịch sử).",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Sửa thông tin. Muốn khóa tài khoản thì đặt IsActive = false (không xóa dòng dữ liệu để giữ lịch sử).\r\nKhông tự khóa chính mình và không khóa admin cuối cùng. Username không đổi được.",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -3305,8 +3892,48 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3344,8 +3971,8 @@
         "tags": [
           "Quản trị: tài khoản"
         ],
-        "summary": "Đặt lại mật khẩu cho người dùng.",
-        "description": "**Quyền truy cập:** Role Admin\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Đặt lại mật khẩu cho người dùng (Admin đặt mật khẩu mới thay họ).",
+        "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
             "name": "id",
@@ -3419,8 +4046,8 @@
         "tags": [
           "Rủi ro (ML)"
         ],
-        "summary": "Chạy dự đoán cho cả lớp (gọi ML service, lưu kết quả). Sinh viên ra mức High sẽ được hệ thống tự gửi cảnh báo.\nTrả về tổng hợp số sinh viên theo từng mức rủi ro. Trả 503 nếu ML service không khả dụng.",
-        "description": "**Quyền truy cập:** Role Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Chạy dự đoán cho cả lớp (gọi ML service, lưu kết quả, giữ lịch sử). Sinh viên ra mức High được hệ thống tự gửi cảnh báo\r\n(không gửi lại nếu đã có cảnh báo tự động trong 7 ngày). Trả về tổng hợp số sinh viên theo từng mức rủi ro.\r\nTrả 400 nếu lớp chưa có sinh viên hoặc chưa điểm danh buổi nào; 503 nếu ML service không khả dụng.",
+        "description": "**Quyền truy cập:** Role Lecturer",
         "parameters": [
           {
             "name": "sectionId",
@@ -3449,6 +4076,46 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RiskSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -3478,9 +4145,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -3495,8 +4159,8 @@
         "tags": [
           "Rủi ro (ML)"
         ],
-        "summary": "Tổng hợp số sinh viên theo mức rủi ro của lớp (dùng vẽ biểu đồ dashboard).",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Tổng hợp số sinh viên theo mức rủi ro của lớp (dùng vẽ biểu đồ dashboard), tính trên kết quả dự đoán mới nhất của từng sinh viên.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer",
         "parameters": [
           {
             "name": "sectionId",
@@ -3529,6 +4193,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -3551,9 +4235,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -3568,8 +4249,8 @@
         "tags": [
           "Rủi ro (ML)"
         ],
-        "summary": "Kết quả dự đoán mới nhất của từng sinh viên trong lớp, lọc theo mức rủi ro, sắp xếp xác suất giảm dần.",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Kết quả dự đoán mới nhất của từng sinh viên trong lớp, lọc theo mức rủi ro, sắp xếp xác suất giảm dần.\r\nLớp chưa từng dự đoán thì trả danh sách rỗng (gọi POST predict trước).",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer",
         "parameters": [
           {
             "name": "sectionId",
@@ -3618,6 +4299,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -3640,9 +4341,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -3657,8 +4355,8 @@
         "tags": [
           "Rủi ro (ML)"
         ],
-        "summary": "Lịch sử dự đoán của một sinh viên trong lớp (theo EnrollmentId), dùng vẽ biểu đồ xu hướng.",
-        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật.",
+        "summary": "Lịch sử dự đoán của một sinh viên trong lớp (theo EnrollmentId), cũ trước mới sau, dùng vẽ biểu đồ xu hướng.",
+        "description": "**Quyền truy cập:** Role Admin hoặc Lecturer",
         "parameters": [
           {
             "name": "enrollmentId",
@@ -3700,6 +4398,26 @@
               }
             }
           },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -3722,9 +4440,6 @@
           },
           "401": {
             "description": "Chưa đăng nhập hoặc token hết hạn"
-          },
-          "403": {
-            "description": "Đã đăng nhập nhưng không đủ quyền"
           }
         },
         "security": [
@@ -3840,6 +4555,20 @@
           "Excused"
         ],
         "type": "string"
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "nullable": true
+          },
+          "newPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "CourseDto": {
         "type": "object",
@@ -4034,7 +4763,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Một dòng bảng điểm. AttendanceScore, TotalScore, IsPassed do backend tự tính (chỉ đọc).\nTotalScore và IsPassed là null cho tới khi có FinalScore."
+        "description": "Một dòng bảng điểm. AttendanceScore, TotalScore, IsPassed do backend tự tính (chỉ đọc).\r\nTotalScore và IsPassed là null cho tới khi có FinalScore."
       },
       "GradeSheet": {
         "type": "object",
@@ -4413,6 +5142,39 @@
         },
         "additionalProperties": false
       },
+      "RetrainStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "version": {
+            "type": "string",
+            "nullable": true
+          },
+          "activated": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Trạng thái lần huấn luyện lại gần nhất. Status: Idle (chưa chạy), Running, Succeeded, Failed."
+      },
       "RiskFactor": {
         "type": "object",
         "properties": {
@@ -4434,7 +5196,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Một yếu tố ảnh hưởng tới rủi ro. Impact là mức ảnh hưởng (0–1, càng lớn càng quan trọng).\nDirection = \"increase\" nếu yếu tố làm tăng nguy cơ rớt, \"decrease\" nếu làm giảm."
+        "description": "Một yếu tố ảnh hưởng tới rủi ro. Impact là mức ảnh hưởng (0–1, càng lớn càng quan trọng).\r\nDirection = \"increase\" nếu yếu tố làm tăng nguy cơ rớt, \"decrease\" nếu làm giảm."
       },
       "RiskHistoryPoint": {
         "type": "object",
@@ -4883,6 +5645,43 @@
           }
         },
         "additionalProperties": false
+      },
+      "TrainingRow": {
+        "type": "object",
+        "properties": {
+          "enrollmentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "absentRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "lateRate": {
+            "type": "number",
+            "format": "double"
+          },
+          "assignmentScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "midtermScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "priorGpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "failed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Một dòng dữ liệu huấn luyện: đặc trưng chụp ở giữa kỳ và nhãn Failed (true = cuối kỳ rớt môn)."
       },
       "UnreadCount": {
         "type": "object",
