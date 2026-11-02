@@ -113,7 +113,7 @@ public class SectionsController(AppDbContext db, ICurrentUser user, SectionAcces
         return Ok(await LoadDetailAsync(id));
     }
 
-    /// <summary>Xóa lớp học phần. Lớp đã có sinh viên đăng ký hoặc điểm danh thì trả 409.</summary>
+    /// <summary>Xóa lớp học phần. Lớp còn sinh viên đăng ký thì trả 409 (xóa hết sinh viên khỏi lớp trước). Các buổi điểm danh còn sót được xóa theo.</summary>
     [HttpDelete("{id:int}")]
     [Authorize(Roles = Roles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -124,8 +124,8 @@ public class SectionsController(AppDbContext db, ICurrentUser user, SectionAcces
         var section = await db.CourseSections.FirstOrDefaultAsync(s => s.Id == id);
         if (section is null)
             return NotFound();
-        if (await db.Enrollments.AnyAsync(e => e.CourseSectionId == id) || await db.AttendanceSessions.AnyAsync(a => a.CourseSectionId == id))
-            return ConflictProblem("Lớp đã có sinh viên hoặc điểm danh, không xóa được");
+        if (await db.Enrollments.AnyAsync(e => e.CourseSectionId == id))
+            return ConflictProblem("Lớp còn sinh viên đăng ký, không xóa được");
 
         db.CourseSections.Remove(section);
         await db.SaveChangesAsync();

@@ -166,8 +166,8 @@ Các khóa ngoại còn lại (`Enrollments → CourseSections`, `AttendanceSess
 
 ## Quy tắc tính điểm (backend tự tính, không nhập tay)
 
-- **`AttendanceScore`** = 10 × (số buổi `Present` + 0.5 × số buổi `Late` + số buổi `Excused`) / `TotalSessions`. Tính lại mỗi khi lưu điểm danh.
-- **`TotalScore`** = tổng (điểm thành phần × trọng số), làm tròn 1 chữ số thập phân. Chỉ tính khi đã có `FinalScore`.
+- **`AttendanceScore`** = 10 × (số buổi `Present` + 0.5 × số buổi `Late` + số buổi `Excused`) / **số buổi đã điểm danh của sinh viên đó**. Khi lớp điểm danh đủ `TotalSessions` buổi, đây chính là công thức cuối kỳ; giữa kỳ thì phản ánh đúng chuyên cần đến thời điểm hiện tại (không bị thấp giả vì các buổi chưa diễn ra). Tính lại mỗi khi lưu điểm danh. Chưa điểm danh buổi nào thì null.
+- **`TotalScore`** = tổng (điểm thành phần × trọng số), làm tròn 1 chữ số thập phân. Chỉ tính khi đã có đủ 4 điểm thành phần (chuyên cần, bài tập, giữa kỳ, cuối kỳ), thiếu một điểm thì null.
 - **`IsPassed`** = `TotalScore >= 4.0` **và** số buổi `Absent` ≤ 20% `TotalSessions` (vắng quá 20% bị cấm thi → rớt). Null khi chưa có `FinalScore`.
 
 ## Ghi chú thiết kế

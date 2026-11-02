@@ -32,7 +32,7 @@ public class RoleDescriptionOperationFilter : IOperationFilter
             access = roles is null ? "Mọi người dùng đã đăng nhập" : "Role " + roles.Replace(",", " hoặc ");
         }
 
-        var isMock = controller.IsDefined(typeof(MockAttribute), true);
+        var isMock = controller.IsDefined(typeof(MockAttribute), true) || method.IsDefined(typeof(MockAttribute), true);
         var note = $"**Quyền truy cập:** {access}" + (isMock ? "\n\n**MOCK:** đang trả dữ liệu mẫu cố định, chưa có logic thật." : "");
         operation.Description = string.IsNullOrEmpty(operation.Description) ? note : operation.Description + "\n\n" + note;
 

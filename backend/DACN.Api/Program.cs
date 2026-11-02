@@ -77,6 +77,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<SectionAccessService>();
 builder.Services.AddScoped<GpaService>();
+builder.Services.AddScoped<GradingService>();
 
 // Chống dò mật khẩu: tối đa 10 lần đăng nhập mỗi phút cho mỗi IP
 builder.Services.AddRateLimiter(options =>
