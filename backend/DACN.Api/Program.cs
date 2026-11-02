@@ -133,7 +133,7 @@ using (var scope = app.Services.CreateScope())
 {
     scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
     await DbSeeder.SeedAdminAsync(scope.ServiceProvider);
-    await DbSeeder.SeedDemoUsersAsync(scope.ServiceProvider);
+    await DemoDataSeeder.SeedAsync(scope.ServiceProvider);
 }
 
 app.UseForwardedHeaders();
