@@ -1,8 +1,9 @@
 using DACN.Api.Auth;
+using DACN.Api.Data;
 using DACN.Api.Dtos;
-using DACN.Api.Mock;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DACN.Api.Controllers;
 
@@ -10,25 +11,35 @@ namespace DACN.Api.Controllers;
 [ApiController]
 [Route("api")]
 [Authorize(Roles = Roles.Admin)]
-[Mock]
-public class PeopleController : ControllerBase
+public class PeopleController(AppDbContext db) : ApiControllerBase
 {
-    /// <summary>Danh sách sinh viên, tìm theo mã hoặc họ tên, có phân trang.</summary>
+    /// <summary>Danh sách sinh viên đang hoạt động, tìm theo mã hoặc họ tên, có phân trang.</summary>
     [HttpGet("students")]
     [ProducesResponseType<PagedResult<StudentItem>>(StatusCodes.Status200OK)]
-    public IActionResult Students([FromQuery] string? q, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> Students([FromQuery] string? q, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
-        var items = MockData.StudentItems.AsEnumerable();
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var query = db.Students.AsNoTracking().Where(s => s.User.IsActive);
         if (!string.IsNullOrWhiteSpace(q))
         {
-            items = items.Where(s => s.StudentCode.Contains(q, StringComparison.OrdinalIgnoreCase)
-                                     || s.FullName.Contains(q, StringComparison.OrdinalIgnoreCase));
+            var term = q.Trim();
+            query = query.Where(s => s.StudentCode.Contains(term) || s.User.FullName.Contains(term));
         }
-        return Ok(MockData.Page(items, page, pageSize));
+
+        var total = await query.CountAsync();
+        var items = await query.OrderBy(s => s.StudentCode).Skip((page - 1) * pageSize).Take(pageSize)
+            .Select(s => new StudentItem(s.Id, s.StudentCode, s.User.FullName, s.ClassName, s.Department.Name))
+            .ToListAsync();
+        return Ok(new PagedResult<StudentItem>(items, page, pageSize, total));
     }
 
-    /// <summary>Danh sách giảng viên.</summary>
+    /// <summary>Danh sách giảng viên đang hoạt động.</summary>
     [HttpGet("lecturers")]
     [ProducesResponseType<IReadOnlyList<LecturerItem>>(StatusCodes.Status200OK)]
-    public IActionResult Lecturers() => Ok(MockData.Lecturers);
+    public async Task<IActionResult> Lecturers() =>
+        Ok(await db.Lecturers.AsNoTracking().Where(l => l.User.IsActive).OrderBy(l => l.LecturerCode)
+            .Select(l => new LecturerItem(l.Id, l.LecturerCode, l.User.FullName, l.Department.Name))
+            .ToListAsync());
 }
