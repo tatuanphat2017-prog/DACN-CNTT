@@ -9,6 +9,7 @@ python tests/api/test_admin.py                # quản trị, import Excel, đ�
 python tests/api/test_attendance_grades.py    # điểm danh, tính điểm, qua/rớt, cổng sinh viên   (91)
 python tests/api/test_demo_data.py            # dữ liệu demo (chạy trên database mới)           (39)
 python tests/api/test_risk_ml.py              # dự đoán, cảnh báo, quản lý mô hình ML           (103)
+python tests/api/test_schedule_stats.py     # thời khóa biểu, lịch/điểm thi, bảng điểm, phòng học, thống kê (115)
 ```
 
 - `test_demo_data.py` mong đợi database vừa được tạo dữ liệu demo; các test còn lại chạy lại nhiều lần được.

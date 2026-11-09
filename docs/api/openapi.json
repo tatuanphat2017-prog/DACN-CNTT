@@ -500,7 +500,7 @@
         "tags": [
           "Cổng sinh viên"
         ],
-        "summary": "Mức rủi ro của sinh viên ở từng lớp (kết quả dự đoán mới nhất), kèm các yếu tố chính và gợi ý cải thiện. Xác suất cao trước.\r\nLớp chưa được dự đoán thì không có trong danh sách.",
+        "summary": "Mức rủi ro của sinh viên ở từng lớp (kết quả dự đoán mới nhất), kèm các yếu tố chính và gợi ý cải thiện. Xác suất cao trước.\nLớp chưa được dự đoán thì không có trong danh sách.",
         "description": "**Quyền truy cập:** Role Student",
         "responses": {
           "200": {
@@ -528,6 +528,270 @@
                   "items": {
                     "$ref": "#/components/schemas/MyRisk"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/students/me/timetable": {
+      "get": {
+        "tags": [
+          "Cổng sinh viên"
+        ],
+        "summary": "Thời khóa biểu hằng tuần của một học kỳ: môn, giảng viên, thứ, tiết, giờ học, phòng, tòa, lầu. Sắp theo thứ rồi tiết.\nKhông truyền semesterId thì lấy học kỳ hiện tại (nếu sinh viên không học học kỳ đó thì lấy học kỳ gần nhất có đăng ký). Lớp chưa xếp lịch không có trong danh sách.",
+        "description": "**Quyền truy cập:** Role Student",
+        "parameters": [
+          {
+            "name": "semesterId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyTimetable"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyTimetable"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyTimetable"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/students/me/schedule": {
+      "get": {
+        "tags": [
+          "Cổng sinh viên"
+        ],
+        "summary": "Lịch học theo ngày trong khoảng from..to (mặc định tuần hiện tại, thứ hai đến chủ nhật; tối đa 92 ngày). Mỗi dòng là một buổi học cụ thể\nvới số buổi (SessionNo) của lớp trong học kỳ. Chỉ tính các ngày nằm trong học kỳ và không vượt tổng số buổi của lớp.",
+        "description": "**Quyền truy cập:** Role Student",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleItem"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleItem"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ScheduleItem"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/students/me/exams": {
+      "get": {
+        "tags": [
+          "Cổng sinh viên"
+        ],
+        "summary": "Điểm thi cuối kỳ và lịch thi (ngày, giờ, phòng, tòa, lầu) của từng lớp. Lọc theo semesterId nếu muốn; mặc định tất cả học kỳ, mới nhất trước.",
+        "description": "**Quyền truy cập:** Role Student",
+        "parameters": [
+          {
+            "name": "semesterId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExamItem"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExamItem"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExamItem"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/students/me/transcript": {
+      "get": {
+        "tags": [
+          "Cổng sinh viên"
+        ],
+        "summary": "Bảng điểm toàn khóa: điểm thành phần và điểm tổng từng môn (kèm điểm quy đổi thang 4), GPA từng học kỳ, GPA từng năm học và GPA tích lũy.\nGPA tính theo tín chỉ; môn không đạt tính 0; môn đang học (chưa có kết quả) không tính vào GPA.",
+        "description": "**Quyền truy cập:** Role Student",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transcript"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transcript"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transcript"
                 }
               }
             }
@@ -1890,7 +2154,7 @@
         "tags": [
           "Điểm"
         ],
-        "summary": "Lưu điểm bài tập, giữa kỳ, cuối kỳ cho nhiều sinh viên cùng lúc. Điểm trong khoảng 0–10 (sai trả 400); điểm null nghĩa là giữ nguyên.\r\nCó đủ điểm thì backend tự tính TotalScore và IsPassed. Trả 400 nếu EnrollmentId không thuộc lớp hoặc trùng nhau.\r\nTrả về bảng điểm đã cập nhật.",
+        "summary": "Lưu điểm bài tập, giữa kỳ, cuối kỳ cho nhiều sinh viên cùng lúc. Điểm trong khoảng 0–10 (sai trả 400); điểm null nghĩa là giữ nguyên.\nCó đủ điểm thì backend tự tính TotalScore và IsPassed. Trả 400 nếu EnrollmentId không thuộc lớp hoặc trùng nhau.\nTrả về bảng điểm đã cập nhật.",
         "description": "**Quyền truy cập:** Role Lecturer",
         "parameters": [
           {
@@ -2215,7 +2479,7 @@
         "tags": [
           "Điểm danh"
         ],
-        "summary": "Lưu điểm danh một buổi (tạo mới hoặc ghi đè). Sinh viên không có trong Marks được ghi mặc định Present.\r\nBackend tự tính lại AttendanceScore, TotalScore, IsPassed của cả lớp. Trả 400 nếu có EnrollmentId không thuộc lớp\r\nhoặc trùng nhau; 404 nếu số buổi ngoài khoảng 1 đến TotalSessions.",
+        "summary": "Lưu điểm danh một buổi (tạo mới hoặc ghi đè). Sinh viên không có trong Marks được ghi mặc định Present.\nBackend tự tính lại AttendanceScore, TotalScore, IsPassed của cả lớp. Trả 400 nếu có EnrollmentId không thuộc lớp\nhoặc trùng nhau; 404 nếu số buổi ngoài khoảng 1 đến TotalSessions.",
         "description": "**Quyền truy cập:** Role Lecturer",
         "parameters": [
           {
@@ -2440,7 +2704,7 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409; môn, học kỳ, giảng viên không tồn tại trả 400.",
+        "summary": "Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409; môn, học kỳ, giảng viên, phòng không tồn tại trả 400.\nLịch học (Schedule) không bắt buộc; trùng phòng hoặc trùng giảng viên cùng học kỳ, cùng thứ, giao tiết trả 409.",
         "description": "**Quyền truy cập:** Role Admin",
         "requestBody": {
           "content": {
@@ -2629,7 +2893,7 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Sửa lớp học phần. Không giảm tổng số buổi xuống thấp hơn số buổi đã điểm danh.",
+        "summary": "Sửa lớp học phần (thay toàn bộ: Schedule bỏ trống nghĩa là xóa lịch học và lịch thi). Không giảm tổng số buổi xuống thấp hơn\nsố buổi đã điểm danh. Trùng phòng hoặc trùng giảng viên trả 409.",
         "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
@@ -2932,7 +3196,7 @@
         "tags": [
           "Lớp học phần"
         ],
-        "summary": "Thêm sinh viên vào lớp. Sinh viên đã có trong lớp được bỏ qua, không báo lỗi. Id không tồn tại hoặc bị khóa trả 400.\r\nPriorGpa của từng sinh viên được tính tự động từ các học kỳ đã kết thúc trước học kỳ của lớp.",
+        "summary": "Thêm sinh viên vào lớp. Sinh viên đã có trong lớp được bỏ qua, không báo lỗi. Id không tồn tại hoặc bị khóa trả 400.\nPriorGpa của từng sinh viên được tính tự động từ các học kỳ đã kết thúc trước học kỳ của lớp.",
         "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
@@ -3109,7 +3373,7 @@
         "tags": [
           "Mô hình ML"
         ],
-        "summary": "Danh sách các phiên bản mô hình và độ chính xác (Accuracy, Precision, Recall, F1, ROC-AUC), mới nhất trước.\r\nTự đồng bộ từ ML service; nếu ML service không khả dụng thì trả dữ liệu đã lưu trong database.",
+        "summary": "Danh sách các phiên bản mô hình và độ chính xác (Accuracy, Precision, Recall, F1, ROC-AUC), mới nhất trước.\nTự đồng bộ từ ML service; nếu ML service không khả dụng thì trả dữ liệu đã lưu trong database.",
         "description": "**Quyền truy cập:** Role Admin",
         "responses": {
           "200": {
@@ -3160,7 +3424,7 @@
         "tags": [
           "Mô hình ML"
         ],
-        "summary": "Yêu cầu huấn luyện lại mô hình bằng dữ liệu thật trong database. Chạy nền, trả 202 ngay;\r\ntheo dõi ở GET /api/ml/retrain/status, phiên bản mới xuất hiện trong GET /api/ml/models.\r\nMô hình mới được dùng ngay nếu ROC-AUC không kém mô hình hiện tại quá 0.01. Đang huấn luyện thì trả 409.",
+        "summary": "Yêu cầu huấn luyện lại mô hình bằng dữ liệu thật trong database. Chạy nền, trả 202 ngay;\ntheo dõi ở GET /api/ml/retrain/status, phiên bản mới xuất hiện trong GET /api/ml/models.\nMô hình mới được dùng ngay nếu ROC-AUC không kém mô hình hiện tại quá 0.01. Đang huấn luyện thì trả 409.",
         "description": "**Quyền truy cập:** Role Admin",
         "responses": {
           "202": {
@@ -3340,7 +3604,7 @@
         "tags": [
           "Mô hình ML"
         ],
-        "summary": "Dữ liệu huấn luyện lấy từ các đăng ký đã có kết quả cuối kỳ: đặc trưng chụp ở giữa kỳ và nhãn Failed.\r\nKhông chứa thông tin định danh sinh viên (chỉ EnrollmentId). Script ml-service/scripts/export_training_data.py dùng API này.",
+        "summary": "Dữ liệu huấn luyện lấy từ các đăng ký đã có kết quả cuối kỳ: đặc trưng chụp ở giữa kỳ và nhãn Failed.\nKhông chứa thông tin định danh sinh viên (chỉ EnrollmentId). Script ml-service/scripts/export_training_data.py dùng API này.",
         "description": "**Quyền truy cập:** Role Admin",
         "responses": {
           "200": {
@@ -3391,7 +3655,7 @@
         "tags": [
           "Nhập Excel"
         ],
-        "summary": "Nhập danh sách sinh viên từ file .xlsx (gửi dạng multipart/form-data, field tên \"file\", tối đa 5MB và 500 dòng).\r\nDòng đầu là tiêu đề, cột bắt buộc: MSSV, Họ tên, Mã khoa, Lớp, Năm nhập học (cột Email tùy chọn).\r\nMỗi dòng tạo một tài khoản sinh viên với username = MSSV. Mật khẩu ban đầu là cấu hình Import:DefaultPassword,\r\nnếu không cấu hình thì bằng chính MSSV (nên đổi sau). Dòng lỗi được báo trong Errors, các dòng đúng vẫn được tạo.",
+        "summary": "Nhập danh sách sinh viên từ file .xlsx (gửi dạng multipart/form-data, field tên \"file\", tối đa 5MB và 500 dòng).\nDòng đầu là tiêu đề, cột bắt buộc: MSSV, Họ tên, Mã khoa, Lớp, Năm nhập học (cột Email tùy chọn).\nMỗi dòng tạo một tài khoản sinh viên với username = MSSV. Mật khẩu ban đầu là cấu hình Import:DefaultPassword,\nnếu không cấu hình thì bằng chính MSSV (nên đổi sau). Dòng lỗi được báo trong Errors, các dòng đúng vẫn được tạo.",
         "description": "**Quyền truy cập:** Role Admin",
         "requestBody": {
           "content": {
@@ -3839,7 +4103,7 @@
         "tags": [
           "Quản trị: tài khoản"
         ],
-        "summary": "Sửa thông tin. Muốn khóa tài khoản thì đặt IsActive = false (không xóa dòng dữ liệu để giữ lịch sử).\r\nKhông tự khóa chính mình và không khóa admin cuối cùng. Username không đổi được.",
+        "summary": "Sửa thông tin. Muốn khóa tài khoản thì đặt IsActive = false (không xóa dòng dữ liệu để giữ lịch sử).\nKhông tự khóa chính mình và không khóa admin cuối cùng. Username không đổi được.",
         "description": "**Quyền truy cập:** Role Admin",
         "parameters": [
           {
@@ -4041,12 +4305,334 @@
         ]
       }
     },
+    "/api/rooms": {
+      "get": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Danh sách phòng học, sắp theo tòa, lầu, mã phòng. Lọc theo tòa bằng building.",
+        "description": "**Quyền truy cập:** Mọi người dùng đã đăng nhập",
+        "parameters": [
+          {
+            "name": "building",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Thêm phòng học. Mã phòng trùng trả 409.",
+        "description": "**Quyền truy cập:** Role Admin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertRoomRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertRoomRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertRoomRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/rooms/{id}": {
+      "put": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Sửa phòng học.",
+        "description": "**Quyền truy cập:** Role Admin",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertRoomRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertRoomRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertRoomRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Xóa phòng học. Phòng đang được dùng cho lịch học hoặc lịch thi của lớp nào thì trả 409.",
+        "description": "**Quyền truy cập:** Role Admin",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
     "/api/sections/{sectionId}/predict": {
       "post": {
         "tags": [
           "Rủi ro (ML)"
         ],
-        "summary": "Chạy dự đoán cho cả lớp (gọi ML service, lưu kết quả, giữ lịch sử). Sinh viên ra mức High được hệ thống tự gửi cảnh báo\r\n(không gửi lại nếu đã có cảnh báo tự động trong 7 ngày). Trả về tổng hợp số sinh viên theo từng mức rủi ro.\r\nTrả 400 nếu lớp chưa có sinh viên hoặc chưa điểm danh buổi nào; 503 nếu ML service không khả dụng.",
+        "summary": "Chạy dự đoán cho cả lớp (gọi ML service, lưu kết quả, giữ lịch sử). Sinh viên ra mức High được hệ thống tự gửi cảnh báo\n(không gửi lại nếu đã có cảnh báo tự động trong 7 ngày). Trả về tổng hợp số sinh viên theo từng mức rủi ro.\nTrả 400 nếu lớp chưa có sinh viên hoặc chưa điểm danh buổi nào; 503 nếu ML service không khả dụng.",
         "description": "**Quyền truy cập:** Role Lecturer",
         "parameters": [
           {
@@ -4249,7 +4835,7 @@
         "tags": [
           "Rủi ro (ML)"
         ],
-        "summary": "Kết quả dự đoán mới nhất của từng sinh viên trong lớp, lọc theo mức rủi ro, sắp xếp xác suất giảm dần.\r\nLớp chưa từng dự đoán thì trả danh sách rỗng (gọi POST predict trước).",
+        "summary": "Kết quả dự đoán mới nhất của từng sinh viên trong lớp, lọc theo mức rủi ro, sắp xếp xác suất giảm dần.\nLớp chưa từng dự đoán thì trả danh sách rỗng (gọi POST predict trước).",
         "description": "**Quyền truy cập:** Role Admin hoặc Lecturer",
         "parameters": [
           {
@@ -4448,6 +5034,120 @@
           }
         ]
       }
+    },
+    "/api/stats/trend": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Xu hướng qua các năm học: mỗi năm có số liệu gộp và danh sách học kỳ (điểm trung bình, GPA trung bình của sinh viên, tỷ lệ đạt).\nNăm học mới nhất trước. Chỉ các đăng ký đã có kết quả cuối mới được tính điểm, GPA và tỷ lệ đạt.",
+        "description": "**Quyền truy cập:** Role Admin",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsTrend"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsTrend"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsTrend"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/stats/overview": {
+      "get": {
+        "tags": [
+          "Stats"
+        ],
+        "summary": "Tổng quan chi tiết một học kỳ: số liệu chung, phân bố điểm tổng, phân bố xếp loại GPA của sinh viên, phân bố mức rủi ro (theo dự đoán mới nhất),\nthống kê theo môn (điểm trung bình, tỷ lệ đạt, số sinh viên rủi ro) và theo lớp sinh hoạt. Không truyền semesterId thì lấy học kỳ hiện tại\n(không có thì lấy học kỳ mới nhất). Học kỳ không tồn tại trả 404.",
+        "description": "**Quyền truy cập:** Role Admin",
+        "parameters": [
+          {
+            "name": "semesterId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterOverview"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterOverview"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SemesterOverview"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Chưa đăng nhập hoặc token hết hạn"
+          },
+          "403": {
+            "description": "Đã đăng nhập nhưng không đủ quyền"
+          }
+        },
+        "security": [
+          {
+            "Bearer": [ ]
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -4570,6 +5270,30 @@
         },
         "additionalProperties": false
       },
+      "ClassStats": {
+        "type": "object",
+        "properties": {
+          "className": {
+            "type": "string",
+            "nullable": true
+          },
+          "students": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageGpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "passRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CourseDto": {
         "type": "object",
         "properties": {
@@ -4625,6 +5349,54 @@
         },
         "additionalProperties": false,
         "description": "Kết quả phân trang. Page bắt đầu từ 1."
+      },
+      "CourseStats": {
+        "type": "object",
+        "properties": {
+          "courseId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "courseCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "courseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "credits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "graded": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "passRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "high": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "medium": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "low": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
       },
       "CreateUserRequest": {
         "type": "object",
@@ -4704,6 +5476,74 @@
         },
         "additionalProperties": false
       },
+      "ExamItem": {
+        "type": "object",
+        "properties": {
+          "sectionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sectionCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "courseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "credits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "semesterName": {
+            "type": "string",
+            "nullable": true
+          },
+          "academicYear": {
+            "type": "string",
+            "nullable": true
+          },
+          "examDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "examStartTime": {
+            "type": "string",
+            "format": "time",
+            "nullable": true
+          },
+          "roomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "building": {
+            "type": "string",
+            "nullable": true
+          },
+          "floor": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "finalScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "isPassed": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Điểm thi cuối kỳ và lịch thi của một lớp. Chưa có điểm thi hoặc chưa xếp lịch thi thì các trường tương ứng là null."
+      },
       "GradeRow": {
         "type": "object",
         "properties": {
@@ -4763,7 +5603,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Một dòng bảng điểm. AttendanceScore, TotalScore, IsPassed do backend tự tính (chỉ đọc).\r\nTotalScore và IsPassed là null cho tới khi có FinalScore."
+        "description": "Một dòng bảng điểm. AttendanceScore, TotalScore, IsPassed do backend tự tính (chỉ đọc).\nTotalScore và IsPassed là null cho tới khi có FinalScore."
       },
       "GradeSheet": {
         "type": "object",
@@ -5091,6 +5931,31 @@
         },
         "additionalProperties": false
       },
+      "MyTimetable": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "semesterName": {
+            "type": "string",
+            "nullable": true
+          },
+          "academicYear": {
+            "type": "string",
+            "nullable": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimetableItem"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -5175,6 +6040,28 @@
         "additionalProperties": false,
         "description": "Trạng thái lần huấn luyện lại gần nhất. Status: Idle (chưa chạy), Running, Succeeded, Failed."
       },
+      "RiskDistribution": {
+        "type": "object",
+        "properties": {
+          "low": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "medium": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "high": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "notPredicted": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "RiskFactor": {
         "type": "object",
         "properties": {
@@ -5196,7 +6083,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Một yếu tố ảnh hưởng tới rủi ro. Impact là mức ảnh hưởng (0–1, càng lớn càng quan trọng).\r\nDirection = \"increase\" nếu yếu tố làm tăng nguy cơ rớt, \"decrease\" nếu làm giảm."
+        "description": "Một yếu tố ảnh hưởng tới rủi ro. Impact là mức ảnh hưởng (0–1, càng lớn càng quan trọng).\nDirection = \"increase\" nếu yếu tố làm tăng nguy cơ rớt, \"decrease\" nếu làm giảm."
       },
       "RiskHistoryPoint": {
         "type": "object",
@@ -5299,6 +6186,32 @@
         },
         "additionalProperties": false
       },
+      "RoomDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "building": {
+            "type": "string",
+            "nullable": true
+          },
+          "floor": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "SaveAttendanceRequest": {
         "type": "object",
         "properties": {
@@ -5355,6 +6268,75 @@
         },
         "additionalProperties": false
       },
+      "ScheduleItem": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "weekday": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sessionNo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sectionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sectionCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "courseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lecturerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "startTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "roomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "building": {
+            "type": "string",
+            "nullable": true
+          },
+          "floor": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Một buổi học cụ thể theo ngày (lịch học). SessionNo là buổi thứ mấy của lớp trong học kỳ."
+      },
+      "ScoreBand": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "SectionDetail": {
         "type": "object",
         "properties": {
@@ -5404,6 +6386,9 @@
           "studentCount": {
             "type": "integer",
             "format": "int32"
+          },
+          "schedule": {
+            "$ref": "#/components/schemas/SectionScheduleInfo"
           }
         },
         "additionalProperties": false
@@ -5484,6 +6469,125 @@
         "additionalProperties": false,
         "description": "Kết quả phân trang. Page bắt đầu từ 1."
       },
+      "SectionScheduleInfo": {
+        "type": "object",
+        "properties": {
+          "weekday": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "startPeriod": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "periodCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "startTime": {
+            "type": "string",
+            "format": "time",
+            "nullable": true
+          },
+          "endTime": {
+            "type": "string",
+            "format": "time",
+            "nullable": true
+          },
+          "roomId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "roomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "building": {
+            "type": "string",
+            "nullable": true
+          },
+          "floor": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "examDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "examStartTime": {
+            "type": "string",
+            "format": "time",
+            "nullable": true
+          },
+          "examRoomId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "examRoomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "examBuilding": {
+            "type": "string",
+            "nullable": true
+          },
+          "examFloor": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SectionScheduleRequest": {
+        "type": "object",
+        "properties": {
+          "weekday": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "startPeriod": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "periodCount": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "roomId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "examDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "examStartTime": {
+            "type": "string",
+            "format": "time",
+            "nullable": true
+          },
+          "examRoomId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Lịch học hằng tuần và lịch thi của lớp. Nhóm lịch học (Weekday, StartPeriod, PeriodCount, RoomId) phải điền đủ cả bốn hoặc bỏ trống cả bốn.\nWeekday 2..8 = Thứ hai..Chủ nhật; tiết 1..12 (tiết 1 bắt đầu 07:00, mỗi tiết 45 phút). Lịch thi: ExamDate bắt buộc nếu có giờ hoặc phòng thi."
+      },
       "SectionStudent": {
         "type": "object",
         "properties": {
@@ -5558,6 +6662,104 @@
         },
         "additionalProperties": false
       },
+      "SemesterOverview": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/SemesterStats"
+          },
+          "scoreDistribution": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScoreBand"
+            },
+            "nullable": true
+          },
+          "gpaDistribution": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScoreBand"
+            },
+            "nullable": true
+          },
+          "risk": {
+            "$ref": "#/components/schemas/RiskDistribution"
+          },
+          "warnings": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "courses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CourseStats"
+            },
+            "nullable": true
+          },
+          "classes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClassStats"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Tổng quan chi tiết một học kỳ: số liệu chung, phân bố điểm, phân bố rủi ro, thống kê theo môn và theo lớp sinh hoạt."
+      },
+      "SemesterStats": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "semesterName": {
+            "type": "string",
+            "nullable": true
+          },
+          "academicYear": {
+            "type": "string",
+            "nullable": true
+          },
+          "isCurrent": {
+            "type": "boolean"
+          },
+          "sections": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "students": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "enrollments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "graded": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "averageGpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "passRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Số liệu tổng hợp của một học kỳ. Chỉ tính các đăng ký đã có kết quả cuối (IsPassed) cho điểm, GPA và tỷ lệ đạt."
+      },
       "SendWarningRequest": {
         "type": "object",
         "properties": {
@@ -5571,6 +6773,20 @@
           }
         },
         "additionalProperties": false
+      },
+      "StatsTrend": {
+        "type": "object",
+        "properties": {
+          "years": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/YearStats"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Xu hướng theo thời gian: từng năm học, trong mỗi năm có từng học kỳ (năm mới nhất trước)."
       },
       "StudentItem": {
         "type": "object",
@@ -5646,6 +6862,65 @@
         },
         "additionalProperties": false
       },
+      "TimetableItem": {
+        "type": "object",
+        "properties": {
+          "sectionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sectionCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "courseCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "courseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lecturerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "weekday": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startPeriod": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "periodCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "roomCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "building": {
+            "type": "string",
+            "nullable": true
+          },
+          "floor": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Một buổi học hằng tuần trong thời khóa biểu: môn, giảng viên, thứ, tiết, giờ và phòng (tòa, lầu)."
+      },
       "TrainingRow": {
         "type": "object",
         "properties": {
@@ -5682,6 +6957,166 @@
         },
         "additionalProperties": false,
         "description": "Một dòng dữ liệu huấn luyện: đặc trưng chụp ở giữa kỳ và nhãn Failed (true = cuối kỳ rớt môn)."
+      },
+      "Transcript": {
+        "type": "object",
+        "properties": {
+          "studentCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "cumulativeGpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "creditsPassed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "years": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranscriptYear"
+            },
+            "nullable": true
+          },
+          "semesters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranscriptSemester"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Bảng điểm toàn khóa: GPA tích lũy, tín chỉ tích lũy, GPA từng năm học và từng học kỳ (mới nhất trước)."
+      },
+      "TranscriptCourse": {
+        "type": "object",
+        "properties": {
+          "sectionId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sectionCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "courseCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "courseName": {
+            "type": "string",
+            "nullable": true
+          },
+          "credits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "attendanceScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "assignmentScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "midtermScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "finalScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "totalScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "gradePoint": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "result": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Một môn trong bảng điểm. Result: \"Đạt\", \"Không đạt\" hoặc \"Đang học\"."
+      },
+      "TranscriptSemester": {
+        "type": "object",
+        "properties": {
+          "semesterId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "semesterName": {
+            "type": "string",
+            "nullable": true
+          },
+          "academicYear": {
+            "type": "string",
+            "nullable": true
+          },
+          "isFinished": {
+            "type": "boolean"
+          },
+          "gpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "creditsRegistered": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "creditsPassed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "courses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TranscriptCourse"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Bảng điểm một học kỳ. Gpa là GPA học kỳ (thang 4, trọng số tín chỉ); null nếu học kỳ chưa có môn nào có kết quả."
+      },
+      "TranscriptYear": {
+        "type": "object",
+        "properties": {
+          "academicYear": {
+            "type": "string",
+            "nullable": true
+          },
+          "gpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "creditsPassed": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
       },
       "UnreadCount": {
         "type": "object",
@@ -5752,6 +7187,28 @@
         },
         "additionalProperties": false
       },
+      "UpsertRoomRequest": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "building": {
+            "type": "string",
+            "nullable": true
+          },
+          "floor": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "UpsertSectionRequest": {
         "type": "object",
         "properties": {
@@ -5777,6 +7234,9 @@
           },
           "weights": {
             "$ref": "#/components/schemas/SectionWeights"
+          },
+          "schedule": {
+            "$ref": "#/components/schemas/SectionScheduleRequest"
           }
         },
         "additionalProperties": false
@@ -6011,6 +7471,46 @@
         },
         "additionalProperties": false,
         "description": "SenderName = null nghĩa là hệ thống tự gửi (khi dự đoán ra mức High)."
+      },
+      "YearStats": {
+        "type": "object",
+        "properties": {
+          "academicYear": {
+            "type": "string",
+            "nullable": true
+          },
+          "students": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "graded": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageScore": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "averageGpa": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "passRate": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "semesters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SemesterStats"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {

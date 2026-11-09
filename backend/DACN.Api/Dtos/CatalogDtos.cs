@@ -18,3 +18,11 @@ public record SemesterDto(int Id, string Name, DateOnly StartDate, DateOnly EndD
 
 /// <summary>Đặt IsCurrent = true sẽ tự bỏ cờ "học kỳ hiện tại" của học kỳ khác.</summary>
 public record UpsertSemesterRequest([Required, MaxLength(50)] string Name, DateOnly StartDate, DateOnly EndDate, bool IsCurrent);
+
+public record RoomDto(int Id, string Code, string Building, int Floor, int Capacity);
+
+public record UpsertRoomRequest(
+    [Required, MaxLength(20)] string Code,
+    [Required, MaxLength(20)] string Building,
+    [Range(0, 50)] int Floor,
+    [Range(1, 1000)] int Capacity);

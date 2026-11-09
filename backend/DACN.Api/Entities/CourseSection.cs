@@ -15,9 +15,22 @@ public class CourseSection
     public decimal MidtermWeight { get; set; } = 0.20m;
     public decimal FinalWeight { get; set; } = 0.50m;
 
+    // Lịch học hằng tuần (cả nhóm null nghĩa là chưa xếp lịch): Weekday 2..8 = Thứ 2..Chủ nhật, tiết 1..12
+    public int? Weekday { get; set; }
+    public int? StartPeriod { get; set; }
+    public int? PeriodCount { get; set; }
+    public int? RoomId { get; set; }
+
+    // Lịch thi cuối kỳ (không bắt buộc)
+    public DateOnly? ExamDate { get; set; }
+    public TimeOnly? ExamStartTime { get; set; }
+    public int? ExamRoomId { get; set; }
+
     public Course Course { get; set; } = null!;
     public Semester Semester { get; set; } = null!;
     public Lecturer Lecturer { get; set; } = null!;
+    public Room? Room { get; set; }
+    public Room? ExamRoom { get; set; }
     public ICollection<Enrollment> Enrollments { get; set; } = [];
     public ICollection<AttendanceSession> AttendanceSessions { get; set; } = [];
 }

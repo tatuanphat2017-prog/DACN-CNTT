@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DACN.Api.Data;
 
 /// <summary>
-/// Tạo dữ liệu demo thật: 6 giảng viên, 120 sinh viên, 16 môn, 3 học kỳ (2 học kỳ đã kết thúc có đủ điểm và kết quả qua/rớt,
+/// Tạo dữ liệu demo thật: 6 giảng viên, 120 sinh viên, 16 môn, 12 phòng học (3 tòa x 4 lầu), 3 học kỳ (2 học kỳ đã kết thúc có đủ điểm và kết quả qua/rớt,
 /// 1 học kỳ hiện tại đang học giữa kỳ). Dữ liệu sinh bằng mô phỏng cố định (seed ngẫu nhiên không đổi): mỗi sinh viên có
 /// "năng lực" và "độ chăm chỉ" ẩn, từ đó ra điểm danh, điểm bài tập, giữa kỳ, cuối kỳ và kết quả. Hai học kỳ cũ chính là
 /// lịch sử để huấn luyện mô hình ML (nhãn = rớt môn).
@@ -121,6 +121,11 @@ public static class DemoDataSeeder
         var courseDifficulty = courses.Select(_ => 0.4 * Normal(rng)).ToArray();     // môn khó/dễ khác nhau
         var semesters = SemesterList.Select(s => new Semester { Name = s.Name, StartDate = s.Start, EndDate = s.End, IsCurrent = !s.Past }).ToList();
 
+        // Phòng học: 3 tòa (A1, A2, B1) x 4 lầu, mỗi lầu một phòng
+        var rooms = new[] { "A1", "A2", "B1" }
+            .SelectMany(b => Enumerable.Range(1, 4).Select(f => new Room { Code = $"{b}.{f}01", Building = b, Floor = f, Capacity = 50 + 10 * f }))
+            .ToList();
+
         var weights = new SectionWeights(0.10m, 0.20m, 0.20m, 0.50m);
         foreach (var s in students)
         {
@@ -135,7 +140,7 @@ public static class DemoDataSeeder
         for (var semIndex = 0; semIndex < semesters.Count; semIndex++)
         {
             var semester = semesters[semIndex];
-            var (_, semCode, semStart, _, past) = SemesterList[semIndex];
+            var (_, semCode, semStart, semEnd, past) = SemesterList[semIndex];
             var held = past ? TotalSessions : SessionsHeldNow;
 
             var semSections = courses.Select((course, i) => new CourseSection
@@ -144,6 +149,10 @@ public static class DemoDataSeeder
                 Lecturer = lecturers[(i + semIndex) % LecturerCount], TotalSessions = TotalSessions,
                 AttendanceWeight = weights.AttendanceWeight, AssignmentWeight = weights.AssignmentWeight,
                 MidtermWeight = weights.MidtermWeight, FinalWeight = weights.FinalWeight,
+                // Mỗi lớp một cặp (thứ, ca) riêng: thứ 2..6, ca 3 tiết (tiết 1-3, 4-6, 7-9, 10-12) nên sinh viên và giảng viên không bao giờ trùng giờ
+                Weekday = 2 + i % 5, StartPeriod = 1 + i / 5 * 3, PeriodCount = 3, Room = rooms[(i * 5 + semIndex * 3) % rooms.Count],
+                ExamDate = ExamDay(semEnd.AddDays(-14 + i % 10)), ExamStartTime = i % 2 == 0 ? new TimeOnly(7, 30) : new TimeOnly(13, 30),
+                ExamRoom = rooms[(i * 7 + semIndex) % rooms.Count],
             }).ToList();
             sections.AddRange(semSections);
 
@@ -185,6 +194,7 @@ public static class DemoDataSeeder
         db.Users.AddRange(lecturers.Select(l => l.User));
         db.Users.AddRange(students.Select(s => s.Student.User));
         db.Semesters.AddRange(semesters);
+        db.Rooms.AddRange(rooms);
         db.CourseSections.AddRange(sections);
         db.Enrollments.AddRange(enrollments);
         db.AttendanceSessions.AddRange(sessions);
@@ -250,6 +260,9 @@ public static class DemoDataSeeder
                 enrollment.MidtermScore = null;
         }
     }
+
+    /// <summary>Ngày thi không rơi vào chủ nhật (dời sang thứ hai).</summary>
+    private static DateOnly ExamDay(DateOnly date) => date.DayOfWeek == DayOfWeek.Sunday ? date.AddDays(1) : date;
 
     private static string RandomName(Random rng)
     {

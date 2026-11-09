@@ -12,7 +12,7 @@ from xml.sax.saxutils import escape
 # Vị trí (cột, hàng) của từng bảng, sắp theo luồng nghiệp vụ
 GRID = {
     "Users": (0, 0), "Lecturers": (1, 0), "Departments": (2, 0), "Courses": (3, 0), "Semesters": (4, 0),
-    "Students": (0, 1), "Warnings": (1, 1), "CourseSections": (3, 1),
+    "Students": (0, 1), "Warnings": (1, 1), "CourseSections": (3, 1), "Rooms": (4, 1),
     "Enrollments": (1, 2), "AttendanceRecords": (2, 2), "AttendanceSessions": (3, 2),
     "ModelVersions": (0, 3), "RiskPredictions": (1, 3),
 }
