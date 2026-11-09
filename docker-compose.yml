@@ -18,8 +18,20 @@ services:
 
   ml-service:
     build: ./ml-service
+    environment:
+      # (Tùy chọn) Nếu đặt thì mọi API của ML service (trừ /health) phải gửi header X-API-Key
+      ML_API_KEY: ${ML_API_KEY:-}
     ports:
       - "127.0.0.1:8000:8000"
+    volumes:
+      # Các phiên bản mô hình huấn luyện lại được lưu ở đây. Lần đầu volume nhận mô hình ban đầu từ image
+      - ml-models:/app/models
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
 
   backend:
     build: ./backend
@@ -30,13 +42,15 @@ services:
       Seed__AdminPassword: ${ADMIN_PASSWORD}
       Seed__DemoPassword: ${DEMO_PASSWORD:-}
       Import__DefaultPassword: ${IMPORT_DEFAULT_PASSWORD:-}
+      MlService__ApiKey: ${ML_API_KEY:-}
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
       sqlserver:
         condition: service_healthy
       ml-service:
-        condition: service_started
+        condition: service_healthy
 
 volumes:
   sqlserver-data:
+  ml-models:
