@@ -1,10 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using DACN.Api.Auth;
 using DACN.Api.Data;
 using DACN.Api.Entities;
+using DACN.Api.Services;
 using DACN.Api.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -41,6 +43,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         // Giữ nguyên tên claim ngắn (sub, name, role), không đổi sang dạng URI dài của .NET
         options.MapInboundClaims = false;
+        options.Events = new JwtBearerEvents
+        {
+            // Tài khoản bị khóa (IsActive = false) hoặc đã xóa thì token cũ cũng hết hiệu lực ngay
+            OnTokenValidated = async context =>
+            {
+                var sub = context.Principal?.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                var db = context.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+                if (!int.TryParse(sub, out var userId) || !await db.Users.AnyAsync(u => u.Id == userId && u.IsActive))
+                {
+                    context.Fail("Tài khoản không tồn tại hoặc đã bị khóa");
+                }
+            },
+        };
         options.TokenValidationParameters = new TokenValidationParameters
         {
             NameClaimType = JwtRegisteredClaimNames.Name,
@@ -58,6 +73,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddScoped<SectionAccessService>();
+builder.Services.AddScoped<GpaService>();
+builder.Services.AddScoped<GradingService>();
 
 // Chống dò mật khẩu: tối đa 10 lần đăng nhập mỗi phút cho mỗi IP
 builder.Services.AddRateLimiter(options =>
@@ -113,7 +133,7 @@ using (var scope = app.Services.CreateScope())
 {
     scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
     await DbSeeder.SeedAdminAsync(scope.ServiceProvider);
-    await DbSeeder.SeedDemoUsersAsync(scope.ServiceProvider);
+    await DemoDataSeeder.SeedAsync(scope.ServiceProvider);
 }
 
 app.UseForwardedHeaders();

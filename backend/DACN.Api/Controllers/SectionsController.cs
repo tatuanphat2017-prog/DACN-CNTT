@@ -1,8 +1,11 @@
 using DACN.Api.Auth;
+using DACN.Api.Data;
 using DACN.Api.Dtos;
-using DACN.Api.Mock;
+using DACN.Api.Entities;
+using DACN.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DACN.Api.Controllers;
 
@@ -10,85 +13,175 @@ namespace DACN.Api.Controllers;
 [ApiController]
 [Route("api/sections")]
 [Authorize]
-[Mock]
-public class SectionsController : ControllerBase
+public class SectionsController(AppDbContext db, ICurrentUser user, SectionAccessService access, GpaService gpa) : ApiControllerBase
 {
-    /// <summary>Danh sách lớp học phần, lọc theo học kỳ, môn học, có phân trang.</summary>
+    /// <summary>Danh sách lớp học phần, lọc theo học kỳ, môn học, có phân trang. Học kỳ mới nhất trước.</summary>
     [HttpGet]
     [ProducesResponseType<PagedResult<SectionListItem>>(StatusCodes.Status200OK)]
-    public IActionResult List([FromQuery] int? semesterId, [FromQuery] int? courseId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    public async Task<IActionResult> List([FromQuery] int? semesterId, [FromQuery] int? courseId, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
     {
-        var items = MockData.Sections.AsEnumerable();
-        if (semesterId is not null) items = items.Where(s => s.SemesterId == semesterId);
-        if (courseId is not null) items = items.Where(s => s.CourseId == courseId);
-        return Ok(MockData.Page(items, page, pageSize));
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var query = db.CourseSections.AsNoTracking();
+        if (user.Role == UserRole.Lecturer)
+        {
+            var lecturerId = await user.GetLecturerIdAsync();
+            query = query.Where(s => s.LecturerId == lecturerId);
+        }
+        else if (user.Role == UserRole.Student)
+        {
+            var studentId = await user.GetStudentIdAsync();
+            query = query.Where(s => s.Enrollments.Any(e => e.StudentId == studentId));
+        }
+        if (semesterId is not null)
+        {
+            query = query.Where(s => s.SemesterId == semesterId);
+        }
+        if (courseId is not null)
+        {
+            query = query.Where(s => s.CourseId == courseId);
+        }
+
+        var total = await query.CountAsync();
+        var items = await query.OrderByDescending(s => s.Semester.StartDate).ThenBy(s => s.Code)
+            .Skip((page - 1) * pageSize).Take(pageSize)
+            .Select(s => new SectionListItem(s.Id, s.Code, s.CourseId, s.Course.Code, s.Course.Name, s.SemesterId, s.Semester.Name,
+                s.LecturerId, s.Lecturer.User.FullName, s.TotalSessions, s.Enrollments.Count))
+            .ToListAsync();
+        return Ok(new PagedResult<SectionListItem>(items, page, pageSize, total));
     }
 
-    /// <summary>Chi tiết một lớp học phần, kèm trọng số điểm.</summary>
+    /// <summary>Chi tiết một lớp học phần, kèm trọng số điểm. Giảng viên chỉ xem lớp mình dạy, sinh viên chỉ xem lớp mình học (sai trả 403).</summary>
     [HttpGet("{id:int}")]
     [ProducesResponseType<SectionDetail>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Get(int id) => MockData.Section(id) is { } s ? Ok(MockData.SectionDetail(s)) : NotFound();
+    public async Task<IActionResult> Get(int id)
+    {
+        var result = await access.GetAsync(id, allowStudent: true);
+        if (Reject(result) is { } denied)
+            return denied;
+        return Ok(await LoadDetailAsync(id));
+    }
 
-    /// <summary>Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409.</summary>
+    /// <summary>Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409; môn, học kỳ, giảng viên không tồn tại trả 400.</summary>
     [HttpPost]
     [Authorize(Roles = Roles.Admin)]
     [ProducesResponseType<SectionDetail>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public IActionResult Create(UpsertSectionRequest request)
+    public async Task<IActionResult> Create(UpsertSectionRequest request)
     {
-        var w = request.Weights;
-        if (w.AttendanceWeight + w.AssignmentWeight + w.MidtermWeight + w.FinalWeight != 1m)
-            return ValidationProblem(new ValidationProblemDetails(new Dictionary<string, string[]> { ["Weights"] = ["Tổng 4 trọng số phải bằng 1"] }));
-        if (MockData.Sections.Any(s => s.Code.Equals(request.Code, StringComparison.OrdinalIgnoreCase)))
-            return Problem(statusCode: StatusCodes.Status409Conflict, title: "Mã lớp học phần đã tồn tại");
+        if (await Validate(request) is { } invalid)
+            return invalid;
+        var code = request.Code.Trim();
+        if (await db.CourseSections.AnyAsync(s => s.Code == code))
+            return ConflictProblem("Mã lớp học phần đã tồn tại");
 
-        var course = MockData.Courses.FirstOrDefault(c => c.Id == request.CourseId);
-        var semester = MockData.Semesters.FirstOrDefault(s => s.Id == request.SemesterId);
-        var lecturer = MockData.Lecturers.FirstOrDefault(l => l.Id == request.LecturerId);
-        var created = new SectionDetail(100, request.Code, request.CourseId, course?.Code ?? "", course?.Name ?? "",
-            request.SemesterId, semester?.Name ?? "", request.LecturerId, lecturer?.FullName ?? "",
-            request.TotalSessions, w, 0);
-        return Created("/api/sections/100", created);
+        var section = new CourseSection { Code = code };
+        Apply(section, request);
+        db.CourseSections.Add(section);
+        await db.SaveChangesAsync();
+        return Created($"/api/sections/{section.Id}", await LoadDetailAsync(section.Id));
     }
 
-    /// <summary>Sửa lớp học phần.</summary>
+    /// <summary>Sửa lớp học phần. Không giảm tổng số buổi xuống thấp hơn số buổi đã điểm danh.</summary>
     [HttpPut("{id:int}")]
     [Authorize(Roles = Roles.Admin)]
     [ProducesResponseType<SectionDetail>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Update(int id, UpsertSectionRequest request) =>
-        MockData.Section(id) is { } s ? Ok(MockData.SectionDetail(s) with { Code = request.Code, TotalSessions = request.TotalSessions, Weights = request.Weights }) : NotFound();
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Update(int id, UpsertSectionRequest request)
+    {
+        var section = await db.CourseSections.FirstOrDefaultAsync(s => s.Id == id);
+        if (section is null)
+            return NotFound();
+        if (await Validate(request) is { } invalid)
+            return invalid;
+        var code = request.Code.Trim();
+        if (await db.CourseSections.AnyAsync(s => s.Code == code && s.Id != id))
+            return ConflictProblem("Mã lớp học phần đã tồn tại");
 
-    /// <summary>Xóa lớp học phần. Lớp đã có sinh viên đăng ký hoặc điểm danh thì trả 409.</summary>
+        var maxSession = await db.AttendanceSessions.Where(a => a.CourseSectionId == id).MaxAsync(a => (int?)a.SessionNo) ?? 0;
+        if (request.TotalSessions < maxSession)
+            return InvalidField("TotalSessions", $"Lớp đã điểm danh tới buổi {maxSession}, tổng số buổi không được nhỏ hơn");
+
+        Apply(section, request);
+        await db.SaveChangesAsync();
+        return Ok(await LoadDetailAsync(id));
+    }
+
+    /// <summary>Xóa lớp học phần. Lớp còn sinh viên đăng ký thì trả 409 (xóa hết sinh viên khỏi lớp trước). Các buổi điểm danh còn sót được xóa theo.</summary>
     [HttpDelete("{id:int}")]
     [Authorize(Roles = Roles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public IActionResult Delete(int id) =>
-        MockData.Section(id) is null ? NotFound()
-        : Problem(statusCode: StatusCodes.Status409Conflict, title: "Lớp đã có sinh viên, không xóa được");
+    public async Task<IActionResult> Delete(int id)
+    {
+        var section = await db.CourseSections.FirstOrDefaultAsync(s => s.Id == id);
+        if (section is null)
+            return NotFound();
+        if (await db.Enrollments.AnyAsync(e => e.CourseSectionId == id))
+            return ConflictProblem("Lớp còn sinh viên đăng ký, không xóa được");
 
-    /// <summary>Danh sách sinh viên trong lớp (kèm EnrollmentId, dùng cho điểm danh, điểm và cảnh báo).</summary>
+        db.CourseSections.Remove(section);
+        await db.SaveChangesAsync();
+        return NoContent();
+    }
+
+    /// <summary>Danh sách sinh viên trong lớp (kèm EnrollmentId, dùng cho điểm danh, điểm và cảnh báo). Giảng viên chỉ xem lớp mình dạy.</summary>
     [HttpGet("{id:int}/students")]
     [Authorize(Roles = Roles.AdminOrLecturer)]
     [ProducesResponseType<IReadOnlyList<SectionStudent>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Students(int id) => MockData.Section(id) is null ? NotFound() : Ok(MockData.SectionStudents());
+    public async Task<IActionResult> Students(int id)
+    {
+        if (Reject(await access.GetAsync(id)) is { } denied)
+            return denied;
+        return Ok(await db.Enrollments.AsNoTracking().Where(e => e.CourseSectionId == id)
+            .OrderBy(e => e.Student.StudentCode)
+            .Select(e => new SectionStudent(e.Id, e.StudentId, e.Student.StudentCode, e.Student.User.FullName, e.Student.ClassName))
+            .ToListAsync());
+    }
 
-    /// <summary>Thêm sinh viên vào lớp. Sinh viên đã có trong lớp được bỏ qua, không báo lỗi.</summary>
+    /// <summary>
+    /// Thêm sinh viên vào lớp. Sinh viên đã có trong lớp được bỏ qua, không báo lỗi. Id không tồn tại hoặc bị khóa trả 400.
+    /// PriorGpa của từng sinh viên được tính tự động từ các học kỳ đã kết thúc trước học kỳ của lớp.
+    /// </summary>
     [HttpPost("{id:int}/students")]
     [Authorize(Roles = Roles.Admin)]
     [ProducesResponseType<EnrollStudentsResult>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Enroll(int id, EnrollStudentsRequest request)
+    public async Task<IActionResult> Enroll(int id, EnrollStudentsRequest request)
     {
-        if (MockData.Section(id) is null) return NotFound();
-        var existing = MockData.SectionStudents().Select(s => s.StudentId).ToHashSet();
-        var already = request.StudentIds.Distinct().Count(existing.Contains);
-        return Ok(new EnrollStudentsResult(request.StudentIds.Distinct().Count() - already, already));
+        var section = await db.CourseSections.Include(s => s.Semester).FirstOrDefaultAsync(s => s.Id == id);
+        if (section is null)
+            return NotFound();
+
+        var ids = request.StudentIds.Distinct().ToList();
+        var valid = await db.Students.Where(s => ids.Contains(s.Id) && s.User.IsActive).Select(s => s.Id).ToListAsync();
+        var missing = ids.Except(valid).ToList();
+        if (missing.Count > 0)
+            return InvalidField("StudentIds", $"Không tìm thấy sinh viên hợp lệ với id: {string.Join(", ", missing)}");
+
+        var already = await db.Enrollments.Where(e => e.CourseSectionId == id && ids.Contains(e.StudentId)).Select(e => e.StudentId).ToListAsync();
+        var toAdd = valid.Except(already).ToList();
+        foreach (var studentId in toAdd)
+        {
+            db.Enrollments.Add(new Enrollment
+            {
+                CourseSectionId = id,
+                StudentId = studentId,
+                PriorGpa = await gpa.PriorGpaAsync(studentId, section.Semester.StartDate),
+            });
+        }
+        await db.SaveChangesAsync();
+        return Ok(new EnrollStudentsResult(toAdd.Count, already.Count));
     }
 
     /// <summary>Xóa sinh viên khỏi lớp (xóa luôn điểm danh, điểm, dự đoán rủi ro, cảnh báo của sinh viên trong lớp).</summary>
@@ -96,30 +189,56 @@ public class SectionsController : ControllerBase
     [Authorize(Roles = Roles.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Unenroll(int id, int enrollmentId) =>
-        MockData.Section(id) is null || !MockData.SectionStudents().Any(s => s.EnrollmentId == enrollmentId) ? NotFound() : NoContent();
-}
-
-/// <summary>Nhập dữ liệu từ file Excel. Chỉ Admin.</summary>
-[ApiController]
-[Route("api/import")]
-[Authorize(Roles = Roles.Admin)]
-[Mock]
-public class ImportController : ControllerBase
-{
-    /// <summary>
-    /// Nhập danh sách sinh viên từ file .xlsx (gửi dạng multipart/form-data, field tên "file").
-    /// Cột bắt buộc: MSSV, Họ tên, Mã khoa, Lớp, Năm nhập học. Dòng lỗi được báo trong Errors, các dòng đúng vẫn được tạo.
-    /// </summary>
-    [HttpPost("students")]
-    [Consumes("multipart/form-data")]
-    [ProducesResponseType<ImportResult>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
-    public IActionResult ImportStudents(IFormFile file)
+    public async Task<IActionResult> Unenroll(int id, int enrollmentId)
     {
-        if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
-            return ValidationProblem(new ValidationProblemDetails(new Dictionary<string, string[]> { ["file"] = ["Chỉ nhận file .xlsx"] }));
+        var enrollment = await db.Enrollments.FirstOrDefaultAsync(e => e.Id == enrollmentId && e.CourseSectionId == id);
+        if (enrollment is null)
+            return NotFound();
 
-        return Ok(new ImportResult(50, 47, 2, [new ImportError(12, "MSSV SV012 đã tồn tại"), new ImportError(31, "Mã khoa KHONGCO không hợp lệ")]));
+        await db.InTransactionAsync(async () =>
+        {
+            // AttendanceRecords.EnrollmentId đặt Restrict (tránh multiple cascade paths) nên phải xóa tay trước
+            await db.AttendanceRecords.Where(r => r.EnrollmentId == enrollmentId).ExecuteDeleteAsync();
+            db.Enrollments.Remove(enrollment);
+            await db.SaveChangesAsync();
+            return true;
+        });
+        return NoContent();
+    }
+
+    private async Task<SectionDetail?> LoadDetailAsync(int id) =>
+        await db.CourseSections.AsNoTracking().Where(s => s.Id == id)
+            .Select(s => new SectionDetail(s.Id, s.Code, s.CourseId, s.Course.Code, s.Course.Name, s.SemesterId, s.Semester.Name,
+                s.LecturerId, s.Lecturer.User.FullName, s.TotalSessions,
+                new SectionWeights(s.AttendanceWeight, s.AssignmentWeight, s.MidtermWeight, s.FinalWeight), s.Enrollments.Count))
+            .FirstOrDefaultAsync();
+
+    private async Task<ActionResult?> Validate(UpsertSectionRequest request)
+    {
+        var w = request.Weights;
+        if (new[] { w.AttendanceWeight, w.AssignmentWeight, w.MidtermWeight, w.FinalWeight }.Any(x => x is < 0 or > 1))
+            return InvalidField("Weights", "Mỗi trọng số phải trong khoảng 0–1");
+        if (w.AttendanceWeight + w.AssignmentWeight + w.MidtermWeight + w.FinalWeight != 1m)
+            return InvalidField("Weights", "Tổng 4 trọng số phải bằng 1");
+        if (!await db.Courses.AnyAsync(c => c.Id == request.CourseId))
+            return InvalidField("CourseId", "Môn học không tồn tại");
+        if (!await db.Semesters.AnyAsync(s => s.Id == request.SemesterId))
+            return InvalidField("SemesterId", "Học kỳ không tồn tại");
+        if (!await db.Lecturers.AnyAsync(l => l.Id == request.LecturerId && l.User.IsActive))
+            return InvalidField("LecturerId", "Giảng viên không tồn tại hoặc đã bị khóa");
+        return null;
+    }
+
+    private static void Apply(CourseSection section, UpsertSectionRequest request)
+    {
+        section.Code = request.Code.Trim();
+        section.CourseId = request.CourseId;
+        section.SemesterId = request.SemesterId;
+        section.LecturerId = request.LecturerId;
+        section.TotalSessions = request.TotalSessions;
+        section.AttendanceWeight = request.Weights.AttendanceWeight;
+        section.AssignmentWeight = request.Weights.AssignmentWeight;
+        section.MidtermWeight = request.Weights.MidtermWeight;
+        section.FinalWeight = request.Weights.FinalWeight;
     }
 }

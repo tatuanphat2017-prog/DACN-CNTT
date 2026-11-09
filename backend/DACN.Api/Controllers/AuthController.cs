@@ -62,6 +62,30 @@ public class AuthController(AppDbContext db, TokenService tokenService, IPasswor
         return Ok(ToUserInfo(user));
     }
 
+    /// <summary>Đổi mật khẩu của chính mình. Sai mật khẩu hiện tại trả 400.</summary>
+    [HttpPost("change-password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+    {
+        var userId = int.Parse(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
+        var user = await db.Users.FindAsync(userId);
+        if (user is null || !user.IsActive)
+        {
+            return Unauthorized();
+        }
+
+        if (passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.CurrentPassword) == PasswordVerificationResult.Failed)
+        {
+            return ValidationProblem(new ValidationProblemDetails(new Dictionary<string, string[]> { ["CurrentPassword"] = ["Mật khẩu hiện tại không đúng"] }));
+        }
+
+        user.PasswordHash = passwordHasher.HashPassword(user, request.NewPassword);
+        await db.SaveChangesAsync();
+        return NoContent();
+    }
+
     private static UserInfo ToUserInfo(User user) =>
         new(user.Id, user.Username, user.FullName, user.Email, user.Role.ToString());
 }

@@ -73,15 +73,15 @@ dotnet user-secrets set "Seed:AdminPassword" "<giống ADMIN_PASSWORD trong .env
 - Phần lớn API đang **MOCK**: trả dữ liệu mẫu cố định (response có header `X-Mock-Data: true`, Swagger ghi rõ). Backend sẽ thay dần bằng logic thật, **hình dạng dữ liệu giữ nguyên** nên Frontend không phải sửa.
 - Dữ liệu mẫu: lớp `IT001.01` có 8 sinh viên với đủ 3 mức rủi ro (4 Low, 2 Medium, 2 High).
 
-**Tài khoản để thử từng role** (đặt `DEMO_PASSWORD` trong `.env` để tự tạo):
+**Dữ liệu demo thật** (tự tạo lần chạy đầu khi đặt `DEMO_PASSWORD` trong `.env`): 6 giảng viên, 120 sinh viên, 16 môn, 3 học kỳ (2 kỳ đã kết thúc có đủ điểm và kết quả qua/rớt, 1 kỳ hiện tại đang học giữa kỳ), 48 lớp, 1.800 lượt đăng ký, khoảng 22.800 lượt điểm danh. Dữ liệu sinh bằng mô phỏng cố định (cùng một kết quả mỗi lần), tỷ lệ rớt khoảng 17%. Hai học kỳ đã kết thúc là lịch sử để huấn luyện mô hình ML.
 
 | Role | Username | Mật khẩu |
 |---|---|---|
 | Admin | `admin` | `ADMIN_PASSWORD` |
-| Giảng viên | `GV001`, `GV002` | `DEMO_PASSWORD` |
-| Sinh viên | `SV001` … `SV008` | `DEMO_PASSWORD` |
+| Giảng viên | `GV001` … `GV006` | `DEMO_PASSWORD` |
+| Sinh viên | `SV001` … `SV120` | `DEMO_PASSWORD` |
 
-Với dữ liệu mẫu, mọi sinh viên đều nhận dữ liệu của `SV002` ở các API `/api/students/me/*`.
+> Dữ liệu demo chỉ được tạo khi database **chưa có lớp học phần nào**. Nếu database cũ đã có dữ liệu thử và muốn tạo lại dữ liệu demo mới: `docker compose down -v` (⚠️ xóa toàn bộ database dev trong Docker) rồi `docker compose up -d --build`.
 
 ## Database & migration (backend)
 

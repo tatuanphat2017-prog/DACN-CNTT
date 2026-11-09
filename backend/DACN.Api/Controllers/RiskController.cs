@@ -104,30 +104,6 @@ public class WarningsController : ControllerBase
     public IActionResult MarkRead(int id) => MockData.Warnings(true).Any(w => w.Id == id) ? NoContent() : NotFound();
 }
 
-/// <summary>Cổng sinh viên: dữ liệu của chính người đang đăng nhập. Chỉ Student.</summary>
-[ApiController]
-[Route("api/students/me")]
-[Authorize(Roles = Roles.Student)]
-[Mock]
-public class StudentPortalController : ControllerBase
-{
-    /// <summary>Các lớp sinh viên đang học, kèm số buổi vắng, điểm tổng và mức rủi ro hiện tại.</summary>
-    [HttpGet("sections")]
-    [ProducesResponseType<IReadOnlyList<MySectionItem>>(StatusCodes.Status200OK)]
-    public IActionResult Sections() => Ok(MockData.MySections());
-
-    /// <summary>Chi tiết một lớp của sinh viên: các điểm thành phần, trọng số, lịch sử điểm danh.</summary>
-    [HttpGet("sections/{sectionId:int}")]
-    [ProducesResponseType<MySectionDetail>(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Section(int sectionId) => MockData.MySection(sectionId) is { } detail ? Ok(detail) : NotFound();
-
-    /// <summary>Mức rủi ro của sinh viên ở từng lớp, kèm các yếu tố chính và gợi ý cải thiện.</summary>
-    [HttpGet("risks")]
-    [ProducesResponseType<IReadOnlyList<MyRisk>>(StatusCodes.Status200OK)]
-    public IActionResult Risks() => Ok(MockData.MyRisks());
-}
-
 /// <summary>Quản lý mô hình Machine Learning. Chỉ Admin.</summary>
 [ApiController]
 [Route("api/ml")]
