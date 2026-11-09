@@ -65,7 +65,10 @@ public class SectionsController(AppDbContext db, ICurrentUser user, SectionAcces
         return Ok(await LoadDetailAsync(id));
     }
 
-    /// <summary>Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409; môn, học kỳ, giảng viên không tồn tại trả 400.</summary>
+    /// <summary>
+    /// Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409; môn, học kỳ, giảng viên, phòng không tồn tại trả 400.
+    /// Lịch học (Schedule) không bắt buộc; trùng phòng hoặc trùng giảng viên cùng học kỳ, cùng thứ, giao tiết trả 409.
+    /// </summary>
     [HttpPost]
     [Authorize(Roles = Roles.Admin)]
     [ProducesResponseType<SectionDetail>(StatusCodes.Status201Created)]
@@ -78,6 +81,8 @@ public class SectionsController(AppDbContext db, ICurrentUser user, SectionAcces
         var code = request.Code.Trim();
         if (await db.CourseSections.AnyAsync(s => s.Code == code))
             return ConflictProblem("Mã lớp học phần đã tồn tại");
+        if (await ScheduleConflict(request, null) is { } conflict)
+            return conflict;
 
         var section = new CourseSection { Code = code };
         Apply(section, request);
@@ -86,7 +91,10 @@ public class SectionsController(AppDbContext db, ICurrentUser user, SectionAcces
         return Created($"/api/sections/{section.Id}", await LoadDetailAsync(section.Id));
     }
 
-    /// <summary>Sửa lớp học phần. Không giảm tổng số buổi xuống thấp hơn số buổi đã điểm danh.</summary>
+    /// <summary>
+    /// Sửa lớp học phần (thay toàn bộ: Schedule bỏ trống nghĩa là xóa lịch học và lịch thi). Không giảm tổng số buổi xuống thấp hơn
+    /// số buổi đã điểm danh. Trùng phòng hoặc trùng giảng viên trả 409.
+    /// </summary>
     [HttpPut("{id:int}")]
     [Authorize(Roles = Roles.Admin)]
     [ProducesResponseType<SectionDetail>(StatusCodes.Status200OK)]
@@ -103,6 +111,9 @@ public class SectionsController(AppDbContext db, ICurrentUser user, SectionAcces
         var code = request.Code.Trim();
         if (await db.CourseSections.AnyAsync(s => s.Code == code && s.Id != id))
             return ConflictProblem("Mã lớp học phần đã tồn tại");
+
+        if (await ScheduleConflict(request, id) is { } conflict)
+            return conflict;
 
         var maxSession = await db.AttendanceSessions.Where(a => a.CourseSectionId == id).MaxAsync(a => (int?)a.SessionNo) ?? 0;
         if (request.TotalSessions < maxSession)
@@ -206,12 +217,47 @@ public class SectionsController(AppDbContext db, ICurrentUser user, SectionAcces
         return NoContent();
     }
 
-    private async Task<SectionDetail?> LoadDetailAsync(int id) =>
-        await db.CourseSections.AsNoTracking().Where(s => s.Id == id)
+    private async Task<SectionDetail?> LoadDetailAsync(int id)
+    {
+        var detail = await db.CourseSections.AsNoTracking().Where(s => s.Id == id)
             .Select(s => new SectionDetail(s.Id, s.Code, s.CourseId, s.Course.Code, s.Course.Name, s.SemesterId, s.Semester.Name,
                 s.LecturerId, s.Lecturer.User.FullName, s.TotalSessions,
-                new SectionWeights(s.AttendanceWeight, s.AssignmentWeight, s.MidtermWeight, s.FinalWeight), s.Enrollments.Count))
+                new SectionWeights(s.AttendanceWeight, s.AssignmentWeight, s.MidtermWeight, s.FinalWeight), s.Enrollments.Count, null))
             .FirstOrDefaultAsync();
+        if (detail is null)
+            return null;
+
+        var section = await db.CourseSections.AsNoTracking().Include(s => s.Room).Include(s => s.ExamRoom).FirstAsync(s => s.Id == id);
+        return detail with { Schedule = ToScheduleInfo(section) };
+    }
+
+    private static SectionScheduleInfo? ToScheduleInfo(CourseSection s)
+    {
+        if (s.Weekday is null && s.ExamDate is null)
+            return null;
+        TimeOnly? start = null, end = null;
+        if (s is { StartPeriod: { } sp, PeriodCount: { } pc })
+            (start, end) = Timetable.Range(sp, pc);
+        return new SectionScheduleInfo(s.Weekday, s.StartPeriod, s.PeriodCount, start, end,
+            s.RoomId, s.Room?.Code, s.Room?.Building, s.Room?.Floor,
+            s.ExamDate, s.ExamStartTime, s.ExamRoomId, s.ExamRoom?.Code, s.ExamRoom?.Building, s.ExamRoom?.Floor);
+    }
+
+    /// <summary>Kiểm tra trùng phòng / trùng giảng viên (cùng học kỳ, cùng thứ, giao tiết). Trả 409 nếu trùng.</summary>
+    private async Task<IActionResult?> ScheduleConflict(UpsertSectionRequest request, int? sectionId)
+    {
+        if (request.Schedule is not { Weekday: { } day, StartPeriod: { } start, PeriodCount: { } count, RoomId: { } roomId })
+            return null;
+
+        var end = start + count;     // tiết kết thúc (không tính)
+        var overlapping = db.CourseSections.Where(o => o.Id != sectionId && o.SemesterId == request.SemesterId && o.Weekday == day
+                                                       && o.StartPeriod < end && start < o.StartPeriod + o.PeriodCount);
+        if (await overlapping.AnyAsync(o => o.RoomId == roomId))
+            return ConflictProblem("Phòng học đã có lớp khác vào thứ và tiết này");
+        if (await overlapping.AnyAsync(o => o.LecturerId == request.LecturerId))
+            return ConflictProblem("Giảng viên đã có lớp khác vào thứ và tiết này");
+        return null;
+    }
 
     private async Task<ActionResult?> Validate(UpsertSectionRequest request)
     {
@@ -226,6 +272,30 @@ public class SectionsController(AppDbContext db, ICurrentUser user, SectionAcces
             return InvalidField("SemesterId", "Học kỳ không tồn tại");
         if (!await db.Lecturers.AnyAsync(l => l.Id == request.LecturerId && l.User.IsActive))
             return InvalidField("LecturerId", "Giảng viên không tồn tại hoặc đã bị khóa");
+        return await ValidateSchedule(request.Schedule);
+    }
+
+    private async Task<ActionResult?> ValidateSchedule(SectionScheduleRequest? s)
+    {
+        if (s is null)
+            return null;
+
+        var given = new object?[] { s.Weekday, s.StartPeriod, s.PeriodCount, s.RoomId }.Count(x => x is not null);
+        if (given is not (0 or 4))
+            return InvalidField("Schedule", "Lịch học phải điền đủ Weekday, StartPeriod, PeriodCount, RoomId hoặc bỏ trống cả bốn");
+        if (given == 4)
+        {
+            if (s.Weekday is < 2 or > 8)
+                return InvalidField("Schedule.Weekday", "Thứ phải từ 2 (Thứ hai) đến 8 (Chủ nhật)");
+            if (s.StartPeriod is < 1 or > Timetable.PeriodsPerDay || s.PeriodCount < 1 || s.StartPeriod + s.PeriodCount - 1 > Timetable.PeriodsPerDay)
+                return InvalidField("Schedule.StartPeriod", $"Tiết học phải nằm trong khoảng 1–{Timetable.PeriodsPerDay}");
+            if (!await db.Rooms.AnyAsync(r => r.Id == s.RoomId))
+                return InvalidField("Schedule.RoomId", "Phòng học không tồn tại");
+        }
+        if ((s.ExamStartTime is not null || s.ExamRoomId is not null) && s.ExamDate is null)
+            return InvalidField("Schedule.ExamDate", "Phải có ngày thi khi đã nhập giờ hoặc phòng thi");
+        if (s.ExamRoomId is { } examRoom && !await db.Rooms.AnyAsync(r => r.Id == examRoom))
+            return InvalidField("Schedule.ExamRoomId", "Phòng thi không tồn tại");
         return null;
     }
 
@@ -240,5 +310,14 @@ public class SectionsController(AppDbContext db, ICurrentUser user, SectionAcces
         section.AssignmentWeight = request.Weights.AssignmentWeight;
         section.MidtermWeight = request.Weights.MidtermWeight;
         section.FinalWeight = request.Weights.FinalWeight;
+
+        var schedule = request.Schedule;
+        section.Weekday = schedule?.Weekday;
+        section.StartPeriod = schedule?.StartPeriod;
+        section.PeriodCount = schedule?.PeriodCount;
+        section.RoomId = schedule?.RoomId;
+        section.ExamDate = schedule?.ExamDate;
+        section.ExamStartTime = schedule?.ExamStartTime;
+        section.ExamRoomId = schedule?.ExamRoomId;
     }
 }

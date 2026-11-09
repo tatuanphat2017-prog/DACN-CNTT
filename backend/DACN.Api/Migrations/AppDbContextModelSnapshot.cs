@@ -140,6 +140,15 @@ namespace DACN.Api.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
+                    b.Property<DateOnly?>("ExamDate")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("ExamRoomId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeOnly?>("ExamStartTime")
+                        .HasColumnType("time");
+
                     b.Property<decimal>("FinalWeight")
                         .HasPrecision(3, 2)
                         .HasColumnType("decimal(3,2)");
@@ -151,10 +160,22 @@ namespace DACN.Api.Migrations
                         .HasPrecision(3, 2)
                         .HasColumnType("decimal(3,2)");
 
+                    b.Property<int?>("PeriodCount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SemesterId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("StartPeriod")
+                        .HasColumnType("int");
+
                     b.Property<int>("TotalSessions")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Weekday")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -164,12 +185,18 @@ namespace DACN.Api.Migrations
 
                     b.HasIndex("CourseId");
 
+                    b.HasIndex("ExamRoomId");
+
                     b.HasIndex("LecturerId");
+
+                    b.HasIndex("RoomId");
 
                     b.HasIndex("SemesterId");
 
                     b.ToTable("CourseSections", t =>
                         {
+                            t.HasCheckConstraint("CK_CourseSections_Schedule", "([Weekday] IS NULL AND [StartPeriod] IS NULL AND [PeriodCount] IS NULL AND [RoomId] IS NULL) OR ([Weekday] BETWEEN 2 AND 8 AND [StartPeriod] BETWEEN 1 AND 12 AND [PeriodCount] >= 1 AND [StartPeriod] + [PeriodCount] - 1 <= 12 AND [RoomId] IS NOT NULL)");
+
                             t.HasCheckConstraint("CK_CourseSections_TotalSessions", "[TotalSessions] > 0");
 
                             t.HasCheckConstraint("CK_CourseSections_Weights", "[AttendanceWeight] + [AssignmentWeight] + [MidtermWeight] + [FinalWeight] = 1");
@@ -392,6 +419,43 @@ namespace DACN.Api.Migrations
                         });
                 });
 
+            modelBuilder.Entity("DACN.Api.Entities.Room", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Building")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<int>("Floor")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Rooms", t =>
+                        {
+                            t.HasCheckConstraint("CK_Rooms_Capacity", "[Capacity] > 0");
+
+                            t.HasCheckConstraint("CK_Rooms_Floor", "[Floor] >= 0");
+                        });
+                });
+
             modelBuilder.Entity("DACN.Api.Entities.Semester", b =>
                 {
                     b.Property<int>("Id")
@@ -599,11 +663,21 @@ namespace DACN.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("DACN.Api.Entities.Room", "ExamRoom")
+                        .WithMany()
+                        .HasForeignKey("ExamRoomId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("DACN.Api.Entities.Lecturer", "Lecturer")
                         .WithMany("CourseSections")
                         .HasForeignKey("LecturerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("DACN.Api.Entities.Room", "Room")
+                        .WithMany("CourseSections")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("DACN.Api.Entities.Semester", "Semester")
                         .WithMany("CourseSections")
@@ -613,7 +687,11 @@ namespace DACN.Api.Migrations
 
                     b.Navigation("Course");
 
+                    b.Navigation("ExamRoom");
+
                     b.Navigation("Lecturer");
+
+                    b.Navigation("Room");
 
                     b.Navigation("Semester");
                 });
@@ -757,6 +835,11 @@ namespace DACN.Api.Migrations
             modelBuilder.Entity("DACN.Api.Entities.ModelVersion", b =>
                 {
                     b.Navigation("RiskPredictions");
+                });
+
+            modelBuilder.Entity("DACN.Api.Entities.Room", b =>
+                {
+                    b.Navigation("CourseSections");
                 });
 
             modelBuilder.Entity("DACN.Api.Entities.Semester", b =>

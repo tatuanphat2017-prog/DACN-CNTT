@@ -14,6 +14,8 @@ erDiagram
     Courses ||--o{ CourseSections : "mở lớp"
     Semesters ||--o{ CourseSections : "trong"
     Lecturers ||--o{ CourseSections : "dạy"
+    Rooms |o--o{ CourseSections : "phòng học"
+    Rooms |o--o{ CourseSections : "phòng thi"
     CourseSections ||--o{ Enrollments : "có"
     Students ||--o{ Enrollments : "đăng ký"
     CourseSections ||--o{ AttendanceSessions : "có buổi"
@@ -67,6 +69,13 @@ erDiagram
         int Credits
         int DepartmentId FK
     }
+    Rooms {
+        int Id PK
+        nvarchar Code UK "vd A2.301"
+        nvarchar Building "tòa, vd A2"
+        int Floor "lầu"
+        int Capacity "sức chứa"
+    }
     CourseSections {
         int Id PK
         nvarchar Code UK
@@ -78,6 +87,13 @@ erDiagram
         decimal AssignmentWeight "decimal(3,2), vd 0.20"
         decimal MidtermWeight "decimal(3,2), vd 0.20"
         decimal FinalWeight "decimal(3,2), vd 0.50"
+        int Weekday "null = chưa xếp lịch; 2..8 = Thứ hai..Chủ nhật"
+        int StartPeriod "tiết bắt đầu 1..12"
+        int PeriodCount "số tiết"
+        int RoomId FK "phòng học, null = chưa xếp"
+        date ExamDate "lịch thi, có thể null"
+        time ExamStartTime
+        int ExamRoomId FK "phòng thi"
     }
     Enrollments {
         int Id PK
@@ -142,7 +158,8 @@ erDiagram
 | `Users` | `Username` duy nhất; `Email` duy nhất khi khác null |
 | `Students`, `Lecturers` | `UserId` duy nhất (quan hệ 1–1 với `Users`) |
 | `Semesters` | Chỉ một dòng có `IsCurrent = 1` (unique filtered index) |
-| `CourseSections` | Tổng 4 trọng số = 1; `TotalSessions > 0` |
+| `Rooms` | `Code` duy nhất; `Floor >= 0`; `Capacity > 0` |
+| `CourseSections` | Tổng 4 trọng số = 1; `TotalSessions > 0`; lịch học điền đủ (`Weekday` 2–8, `StartPeriod` 1–12, `PeriodCount >= 1`, kết thúc không quá tiết 12, `RoomId`) hoặc bỏ trống cả nhóm |
 | `Enrollments` | Cặp (`CourseSectionId`, `StudentId`) duy nhất; mọi cột điểm trong khoảng 0–10; `PriorGpa` trong khoảng 0–4 |
 | `AttendanceSessions` | Cặp (`CourseSectionId`, `SessionNo`) duy nhất; `SessionNo` từ 1 đến `TotalSessions` |
 | `AttendanceRecords` | Cặp (`AttendanceSessionId`, `EnrollmentId`) duy nhất |
@@ -158,6 +175,7 @@ SQL Server không cho phép một bảng bị xóa dây chuyền theo hai đư�
 | `AttendanceRecords.EnrollmentId` | Restrict | Đã cascade qua `AttendanceSessions` |
 | `Warnings.LecturerId` | Restrict | `Users` có 2 đường tới `Warnings` (qua `Lecturers` và qua `Students → Enrollments`), nên SQL Server không cho Set null. Giảng viên nghỉ thì khóa tài khoản (`Users.IsActive = 0`) thay vì xóa |
 | `CourseSections.LecturerId` | Restrict | Không xóa giảng viên đang có lớp |
+| `CourseSections.RoomId`, `CourseSections.ExamRoomId` | Restrict | Không xóa phòng đang được dùng cho lịch học hoặc lịch thi |
 | `Students.DepartmentId`, `Lecturers.DepartmentId`, `Courses.DepartmentId` | Restrict | Không xóa khoa đang có dữ liệu |
 | `CourseSections.CourseId`, `CourseSections.SemesterId` | Restrict | Không xóa môn/học kỳ đang có lớp |
 | `RiskPredictions.ModelVersionId` | Restrict | Giữ lịch sử dự đoán |

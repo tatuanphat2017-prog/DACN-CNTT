@@ -11,6 +11,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Lecturer> Lecturers => Set<Lecturer>();
     public DbSet<Semester> Semesters => Set<Semester>();
     public DbSet<Course> Courses => Set<Course>();
+    public DbSet<Room> Rooms => Set<Room>();
     public DbSet<CourseSection> CourseSections => Set<CourseSection>();
     public DbSet<Enrollment> Enrollments => Set<Enrollment>();
     public DbSet<AttendanceSession> AttendanceSessions => Set<AttendanceSession>();
@@ -79,6 +80,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.ToTable(t => t.HasCheckConstraint("CK_Courses_Credits", "[Credits] > 0"));
         });
 
+        modelBuilder.Entity<Room>(e =>
+        {
+            e.Property(x => x.Code).HasMaxLength(20);
+            e.Property(x => x.Building).HasMaxLength(20);
+            e.HasIndex(x => x.Code).IsUnique();
+            e.ToTable(t =>
+            {
+                t.HasCheckConstraint("CK_Rooms_Floor", "[Floor] >= 0");
+                t.HasCheckConstraint("CK_Rooms_Capacity", "[Capacity] > 0");
+            });
+        });
+
         modelBuilder.Entity<CourseSection>(e =>
         {
             e.Property(x => x.Code).HasMaxLength(30);
@@ -93,8 +106,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasForeignKey(x => x.SemesterId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne(x => x.Lecturer).WithMany(l => l.CourseSections)
                 .HasForeignKey(x => x.LecturerId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(x => x.Room).WithMany(r => r.CourseSections)
+                .HasForeignKey(x => x.RoomId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(x => x.ExamRoom).WithMany()
+                .HasForeignKey(x => x.ExamRoomId).OnDelete(DeleteBehavior.Restrict);
             e.ToTable(t =>
             {
+                t.HasCheckConstraint("CK_CourseSections_Schedule",
+                    "([Weekday] IS NULL AND [StartPeriod] IS NULL AND [PeriodCount] IS NULL AND [RoomId] IS NULL) OR " +
+                    "([Weekday] BETWEEN 2 AND 8 AND [StartPeriod] BETWEEN 1 AND 12 AND [PeriodCount] >= 1 AND [StartPeriod] + [PeriodCount] - 1 <= 12 AND [RoomId] IS NOT NULL)");
                 t.HasCheckConstraint("CK_CourseSections_TotalSessions", "[TotalSessions] > 0");
                 t.HasCheckConstraint("CK_CourseSections_Weights",
                     "[AttendanceWeight] + [AssignmentWeight] + [MidtermWeight] + [FinalWeight] = 1");

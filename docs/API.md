@@ -2,7 +2,7 @@
 
 > File này sinh tự động từ `docs/api/openapi.json` bằng `docs/tools/gen_api_doc.py`. Chi tiết dữ liệu gửi/nhận xem trên Swagger (`/swagger`) của backend.
 
-**55 endpoint**, tất cả đã có logic thật (dùng dữ liệu trong database).
+**65 endpoint**, tất cả đã có logic thật (dùng dữ liệu trong database).
 
 ## Quy ước chung
 
@@ -29,7 +29,7 @@
 | `GET` | `/api/users` | Admin | Danh sách người dùng, lọc theo role và từ khóa (username, họ tên hoặc email), có phân trang. |
 | `POST` | `/api/users` | Admin | Tạo tài khoản. Role = Student phải có Student, Role = Lecturer phải có Lecturer. Username, email, mã sinh viên, mã giảng viên trùng trả 409. |
 | `GET` | `/api/users/{id}` | Admin | Chi tiết một người dùng, kèm hồ sơ sinh viên hoặc giảng viên. |
-| `PUT` | `/api/users/{id}` | Admin | Sửa thông tin. Muốn khóa tài khoản thì đặt IsActive = false (không xóa dòng dữ liệu để giữ lịch sử). Không tự khóa chính mình và không khóa admin cuối cùng. Username không đổi được. |
+| `PUT` | `/api/users/{id}` | Admin | Sửa thông tin. Muốn khóa tài khoản thì đặt IsActive = false (không xóa dòng dữ liệu để giữ lịch sử). Không tự khóa chính mình và không khóa admin cuối cùng. Username không đổi được. |
 | `POST` | `/api/users/{id}/reset-password` | Admin | Đặt lại mật khẩu cho người dùng (Admin đặt mật khẩu mới thay họ). |
 
 ## Quản trị: sinh viên, giảng viên
@@ -72,19 +72,19 @@
 | Method | Đường dẫn | Quyền | Mô tả |
 |---|---|---|---|
 | `GET` | `/api/sections` | Mọi role | Danh sách lớp học phần, lọc theo học kỳ, môn học, có phân trang. Học kỳ mới nhất trước. |
-| `POST` | `/api/sections` | Admin | Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409; môn, học kỳ, giảng viên không tồn tại trả 400. |
+| `POST` | `/api/sections` | Admin | Mở lớp học phần. Tổng 4 trọng số phải bằng 1. Mã lớp trùng trả 409; môn, học kỳ, giảng viên, phòng không tồn tại trả 400. Lịch học (Schedule) không bắt buộc; trùng phòng hoặc trùng giảng viên cùng học kỳ, cùng thứ, giao tiết trả 409. |
 | `GET` | `/api/sections/{id}` | Mọi role | Chi tiết một lớp học phần, kèm trọng số điểm. Giảng viên chỉ xem lớp mình dạy, sinh viên chỉ xem lớp mình học (sai trả 403). |
-| `PUT` | `/api/sections/{id}` | Admin | Sửa lớp học phần. Không giảm tổng số buổi xuống thấp hơn số buổi đã điểm danh. |
+| `PUT` | `/api/sections/{id}` | Admin | Sửa lớp học phần (thay toàn bộ: Schedule bỏ trống nghĩa là xóa lịch học và lịch thi). Không giảm tổng số buổi xuống thấp hơn số buổi đã điểm danh. Trùng phòng hoặc trùng giảng viên trả 409. |
 | `DELETE` | `/api/sections/{id}` | Admin | Xóa lớp học phần. Lớp còn sinh viên đăng ký thì trả 409 (xóa hết sinh viên khỏi lớp trước). Các buổi điểm danh còn sót được xóa theo. |
 | `GET` | `/api/sections/{id}/students` | Admin hoặc Lecturer | Danh sách sinh viên trong lớp (kèm EnrollmentId, dùng cho điểm danh, điểm và cảnh báo). Giảng viên chỉ xem lớp mình dạy. |
-| `POST` | `/api/sections/{id}/students` | Admin | Thêm sinh viên vào lớp. Sinh viên đã có trong lớp được bỏ qua, không báo lỗi. Id không tồn tại hoặc bị khóa trả 400. PriorGpa của từng sinh viên được tính tự động từ các học kỳ đã kết thúc trước học kỳ của lớp. |
+| `POST` | `/api/sections/{id}/students` | Admin | Thêm sinh viên vào lớp. Sinh viên đã có trong lớp được bỏ qua, không báo lỗi. Id không tồn tại hoặc bị khóa trả 400. PriorGpa của từng sinh viên được tính tự động từ các học kỳ đã kết thúc trước học kỳ của lớp. |
 | `DELETE` | `/api/sections/{id}/students/{enrollmentId}` | Admin | Xóa sinh viên khỏi lớp (xóa luôn điểm danh, điểm, dự đoán rủi ro, cảnh báo của sinh viên trong lớp). |
 
 ## Nhập Excel
 
 | Method | Đường dẫn | Quyền | Mô tả |
 |---|---|---|---|
-| `POST` | `/api/import/students` | Admin | Nhập danh sách sinh viên từ file .xlsx (gửi dạng multipart/form-data, field tên "file", tối đa 5MB và 500 dòng). Dòng đầu là tiêu đề, cột bắt buộc: MSSV, Họ tên, Mã khoa, Lớp, Năm nhập học (cột Email tùy chọn). Mỗi dòng tạo một tài khoản sinh viên với username = MSSV. Mật khẩu ban đầu là cấu hình Import:DefaultPassword, nếu không cấu hình thì bằng chính MSSV (nên đổi sau). Dòng lỗi được báo trong Errors, các dòng đúng vẫn được tạo. |
+| `POST` | `/api/import/students` | Admin | Nhập danh sách sinh viên từ file .xlsx (gửi dạng multipart/form-data, field tên "file", tối đa 5MB và 500 dòng). Dòng đầu là tiêu đề, cột bắt buộc: MSSV, Họ tên, Mã khoa, Lớp, Năm nhập học (cột Email tùy chọn). Mỗi dòng tạo một tài khoản sinh viên với username = MSSV. Mật khẩu ban đầu là cấu hình Import:DefaultPassword, nếu không cấu hình thì bằng chính MSSV (nên đổi sau). Dòng lỗi được báo trong Errors, các dòng đúng vẫn được tạo. |
 
 ## Điểm danh
 
@@ -92,23 +92,23 @@
 |---|---|---|---|
 | `GET` | `/api/sections/{sectionId}/attendance` | Admin hoặc Lecturer | Tóm tắt tất cả các buổi của lớp (đủ TotalSessions buổi, buổi chưa điểm danh có Date = null). |
 | `GET` | `/api/sections/{sectionId}/attendance/{sessionNo}` | Admin hoặc Lecturer | Bảng điểm danh của một buổi: mỗi sinh viên một trạng thái (Present, Absent, Late, Excused). Buổi chưa điểm danh mặc định tất cả Present. |
-| `PUT` | `/api/sections/{sectionId}/attendance/{sessionNo}` | Lecturer | Lưu điểm danh một buổi (tạo mới hoặc ghi đè). Sinh viên không có trong Marks được ghi mặc định Present. Backend tự tính lại AttendanceScore, TotalScore, IsPassed của cả lớp. Trả 400 nếu có EnrollmentId không thuộc lớp hoặc trùng nhau; 404 nếu số buổi ngoài khoảng 1 đến TotalSessions. |
+| `PUT` | `/api/sections/{sectionId}/attendance/{sessionNo}` | Lecturer | Lưu điểm danh một buổi (tạo mới hoặc ghi đè). Sinh viên không có trong Marks được ghi mặc định Present. Backend tự tính lại AttendanceScore, TotalScore, IsPassed của cả lớp. Trả 400 nếu có EnrollmentId không thuộc lớp hoặc trùng nhau; 404 nếu số buổi ngoài khoảng 1 đến TotalSessions. |
 
 ## Điểm
 
 | Method | Đường dẫn | Quyền | Mô tả |
 |---|---|---|---|
 | `GET` | `/api/sections/{sectionId}/grades` | Admin hoặc Lecturer | Bảng điểm cả lớp. AttendanceScore, TotalScore, IsPassed do backend tính, chỉ đọc. |
-| `PUT` | `/api/sections/{sectionId}/grades` | Lecturer | Lưu điểm bài tập, giữa kỳ, cuối kỳ cho nhiều sinh viên cùng lúc. Điểm trong khoảng 0–10 (sai trả 400); điểm null nghĩa là giữ nguyên. Có đủ điểm thì backend tự tính TotalScore và IsPassed. Trả 400 nếu EnrollmentId không thuộc lớp hoặc trùng nhau. Trả về bảng điểm đã cập nhật. |
+| `PUT` | `/api/sections/{sectionId}/grades` | Lecturer | Lưu điểm bài tập, giữa kỳ, cuối kỳ cho nhiều sinh viên cùng lúc. Điểm trong khoảng 0–10 (sai trả 400); điểm null nghĩa là giữ nguyên. Có đủ điểm thì backend tự tính TotalScore và IsPassed. Trả 400 nếu EnrollmentId không thuộc lớp hoặc trùng nhau. Trả về bảng điểm đã cập nhật. |
 
 ## Rủi ro (ML)
 
 | Method | Đường dẫn | Quyền | Mô tả |
 |---|---|---|---|
 | `GET` | `/api/enrollments/{enrollmentId}/risk-history` | Admin hoặc Lecturer | Lịch sử dự đoán của một sinh viên trong lớp (theo EnrollmentId), cũ trước mới sau, dùng vẽ biểu đồ xu hướng. |
-| `POST` | `/api/sections/{sectionId}/predict` | Lecturer | Chạy dự đoán cho cả lớp (gọi ML service, lưu kết quả, giữ lịch sử). Sinh viên ra mức High được hệ thống tự gửi cảnh báo (không gửi lại nếu đã có cảnh báo tự động trong 7 ngày). Trả về tổng hợp số sinh viên theo từng mức rủi ro. Trả 400 nếu lớp chưa có sinh viên hoặc chưa điểm danh buổi nào; 503 nếu ML service không khả dụng. |
+| `POST` | `/api/sections/{sectionId}/predict` | Lecturer | Chạy dự đoán cho cả lớp (gọi ML service, lưu kết quả, giữ lịch sử). Sinh viên ra mức High được hệ thống tự gửi cảnh báo (không gửi lại nếu đã có cảnh báo tự động trong 7 ngày). Trả về tổng hợp số sinh viên theo từng mức rủi ro. Trả 400 nếu lớp chưa có sinh viên hoặc chưa điểm danh buổi nào; 503 nếu ML service không khả dụng. |
 | `GET` | `/api/sections/{sectionId}/risk-summary` | Admin hoặc Lecturer | Tổng hợp số sinh viên theo mức rủi ro của lớp (dùng vẽ biểu đồ dashboard), tính trên kết quả dự đoán mới nhất của từng sinh viên. |
-| `GET` | `/api/sections/{sectionId}/risks` | Admin hoặc Lecturer | Kết quả dự đoán mới nhất của từng sinh viên trong lớp, lọc theo mức rủi ro, sắp xếp xác suất giảm dần. Lớp chưa từng dự đoán thì trả danh sách rỗng (gọi POST predict trước). |
+| `GET` | `/api/sections/{sectionId}/risks` | Admin hoặc Lecturer | Kết quả dự đoán mới nhất của từng sinh viên trong lớp, lọc theo mức rủi ro, sắp xếp xác suất giảm dần. Lớp chưa từng dự đoán thì trả danh sách rỗng (gọi POST predict trước). |
 
 ## Cảnh báo
 
@@ -124,22 +124,42 @@
 
 | Method | Đường dẫn | Quyền | Mô tả |
 |---|---|---|---|
-| `GET` | `/api/students/me/risks` | Student | Mức rủi ro của sinh viên ở từng lớp (kết quả dự đoán mới nhất), kèm các yếu tố chính và gợi ý cải thiện. Xác suất cao trước. Lớp chưa được dự đoán thì không có trong danh sách. |
+| `GET` | `/api/students/me/exams` | Student | Điểm thi cuối kỳ và lịch thi (ngày, giờ, phòng, tòa, lầu) của từng lớp. Lọc theo semesterId nếu muốn; mặc định tất cả học kỳ, mới nhất trước. |
+| `GET` | `/api/students/me/risks` | Student | Mức rủi ro của sinh viên ở từng lớp (kết quả dự đoán mới nhất), kèm các yếu tố chính và gợi ý cải thiện. Xác suất cao trước. Lớp chưa được dự đoán thì không có trong danh sách. |
+| `GET` | `/api/students/me/schedule` | Student | Lịch học theo ngày trong khoảng from..to (mặc định tuần hiện tại, thứ hai đến chủ nhật; tối đa 92 ngày). Mỗi dòng là một buổi học cụ thể với số buổi (SessionNo) của lớp trong học kỳ. Chỉ tính các ngày nằm trong học kỳ và không vượt tổng số buổi của lớp. |
 | `GET` | `/api/students/me/sections` | Student | Các lớp sinh viên đang học (mới nhất trước), kèm số buổi vắng, điểm tổng và mức rủi ro hiện tại. |
 | `GET` | `/api/students/me/sections/{sectionId}` | Student | Chi tiết một lớp của sinh viên: các điểm thành phần, trọng số, lịch sử điểm danh. Lớp không đăng ký trả 404. |
+| `GET` | `/api/students/me/timetable` | Student | Thời khóa biểu hằng tuần của một học kỳ: môn, giảng viên, thứ, tiết, giờ học, phòng, tòa, lầu. Sắp theo thứ rồi tiết. Không truyền semesterId thì lấy học kỳ hiện tại (nếu sinh viên không học học kỳ đó thì lấy học kỳ gần nhất có đăng ký). Lớp chưa xếp lịch không có trong danh sách. |
+| `GET` | `/api/students/me/transcript` | Student | Bảng điểm toàn khóa: điểm thành phần và điểm tổng từng môn (kèm điểm quy đổi thang 4), GPA từng học kỳ, GPA từng năm học và GPA tích lũy. GPA tính theo tín chỉ; môn không đạt tính 0; môn đang học (chưa có kết quả) không tính vào GPA. |
 
 ## Mô hình ML
 
 | Method | Đường dẫn | Quyền | Mô tả |
 |---|---|---|---|
-| `GET` | `/api/ml/models` | Admin | Danh sách các phiên bản mô hình và độ chính xác (Accuracy, Precision, Recall, F1, ROC-AUC), mới nhất trước. Tự đồng bộ từ ML service; nếu ML service không khả dụng thì trả dữ liệu đã lưu trong database. |
+| `GET` | `/api/ml/models` | Admin | Danh sách các phiên bản mô hình và độ chính xác (Accuracy, Precision, Recall, F1, ROC-AUC), mới nhất trước. Tự đồng bộ từ ML service; nếu ML service không khả dụng thì trả dữ liệu đã lưu trong database. |
 | `POST` | `/api/ml/models/{id}/activate` | Admin | Chuyển sang dùng một phiên bản mô hình đã lưu. Trả 404 nếu không có phiên bản đó, 503 nếu ML service không khả dụng. |
-| `POST` | `/api/ml/retrain` | Admin | Yêu cầu huấn luyện lại mô hình bằng dữ liệu thật trong database. Chạy nền, trả 202 ngay; theo dõi ở GET /api/ml/retrain/status, phiên bản mới xuất hiện trong GET /api/ml/models. Mô hình mới được dùng ngay nếu ROC-AUC không kém mô hình hiện tại quá 0.01. Đang huấn luyện thì trả 409. |
+| `POST` | `/api/ml/retrain` | Admin | Yêu cầu huấn luyện lại mô hình bằng dữ liệu thật trong database. Chạy nền, trả 202 ngay; theo dõi ở GET /api/ml/retrain/status, phiên bản mới xuất hiện trong GET /api/ml/models. Mô hình mới được dùng ngay nếu ROC-AUC không kém mô hình hiện tại quá 0.01. Đang huấn luyện thì trả 409. |
 | `GET` | `/api/ml/retrain/status` | Admin | Trạng thái lần huấn luyện lại gần nhất (Idle, Running, Succeeded, Failed) kèm thông báo kết quả. |
-| `GET` | `/api/ml/training-data` | Admin | Dữ liệu huấn luyện lấy từ các đăng ký đã có kết quả cuối kỳ: đặc trưng chụp ở giữa kỳ và nhãn Failed. Không chứa thông tin định danh sinh viên (chỉ EnrollmentId). Script ml-service/scripts/export_training_data.py dùng API này. |
+| `GET` | `/api/ml/training-data` | Admin | Dữ liệu huấn luyện lấy từ các đăng ký đã có kết quả cuối kỳ: đặc trưng chụp ở giữa kỳ và nhãn Failed. Không chứa thông tin định danh sinh viên (chỉ EnrollmentId). Script ml-service/scripts/export_training_data.py dùng API này. |
 
 ## Kiểm tra hệ thống
 
 | Method | Đường dẫn | Quyền | Mô tả |
 |---|---|---|---|
 | `GET` | `/api/health` | Công khai | Kiểm tra backend, database và ML service có kết nối được không. |
+
+## Rooms
+
+| Method | Đường dẫn | Quyền | Mô tả |
+|---|---|---|---|
+| `GET` | `/api/rooms` | Mọi role | Danh sách phòng học, sắp theo tòa, lầu, mã phòng. Lọc theo tòa bằng building. |
+| `POST` | `/api/rooms` | Admin | Thêm phòng học. Mã phòng trùng trả 409. |
+| `PUT` | `/api/rooms/{id}` | Admin | Sửa phòng học. |
+| `DELETE` | `/api/rooms/{id}` | Admin | Xóa phòng học. Phòng đang được dùng cho lịch học hoặc lịch thi của lớp nào thì trả 409. |
+
+## Stats
+
+| Method | Đường dẫn | Quyền | Mô tả |
+|---|---|---|---|
+| `GET` | `/api/stats/overview` | Admin | Tổng quan chi tiết một học kỳ: số liệu chung, phân bố điểm tổng, phân bố xếp loại GPA của sinh viên, phân bố mức rủi ro (theo dự đoán mới nhất), thống kê theo môn (điểm trung bình, tỷ lệ đạt, số sinh viên rủi ro) và theo lớp sinh hoạt. Không truyền semesterId thì lấy học kỳ hiện tại (không có thì lấy học kỳ mới nhất). Học kỳ không tồn tại trả 404. |
+| `GET` | `/api/stats/trend` | Admin | Xu hướng qua các năm học: mỗi năm có số liệu gộp và danh sách học kỳ (điểm trung bình, GPA trung bình của sinh viên, tỷ lệ đạt). Năm học mới nhất trước. Chỉ các đăng ký đã có kết quả cuối mới được tính điểm, GPA và tỷ lệ đạt. |

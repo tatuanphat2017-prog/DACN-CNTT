@@ -68,13 +68,13 @@ dotnet user-secrets set "Seed:AdminPassword" "<giống ADMIN_PASSWORD trong .env
 ## API cho Frontend
 
 - Swagger (xem và gọi thử): http://localhost:8080/swagger — nút **Authorize** để dán token.
-- Bảng tóm tắt 55 endpoint và quyền của từng role: [docs/API.md](docs/API.md).
+- Bảng tóm tắt 65 endpoint và quyền của từng role: [docs/API.md](docs/API.md).
 - Đặc tả OpenAPI: [docs/api/openapi.json](docs/api/openapi.json) (có thể dùng sinh kiểu TypeScript, ví dụ `npx openapi-typescript docs/api/openapi.json -o src/api/schema.d.ts`).
 - Tất cả API đã có logic thật. Hình dạng dữ liệu giữ nguyên so với bản mock trước đó nên Frontend không phải sửa.
 - Quyền theo dữ liệu: giảng viên chỉ thao tác lớp mình dạy, sinh viên chỉ xem dữ liệu của mình (sai trả **403**). Khóa tài khoản làm token cũ hết hiệu lực ngay.
 - Đăng nhập sai quá **10 lần mỗi phút** từ một IP thì bị chặn tạm (**429**).
 
-**Dữ liệu demo thật** (tự tạo lần chạy đầu khi đặt `DEMO_PASSWORD` trong `.env`): 6 giảng viên, 120 sinh viên, 16 môn, 3 học kỳ (2 kỳ đã kết thúc có đủ điểm và kết quả qua/rớt, 1 kỳ hiện tại đang học giữa kỳ), 48 lớp, 1.800 lượt đăng ký, khoảng 22.800 lượt điểm danh. Dữ liệu sinh bằng mô phỏng cố định (cùng một kết quả mỗi lần), tỷ lệ rớt khoảng 17%. Hai học kỳ đã kết thúc là lịch sử để huấn luyện mô hình ML.
+**Dữ liệu demo thật** (tự tạo lần chạy đầu khi đặt `DEMO_PASSWORD` trong `.env`): 6 giảng viên, 120 sinh viên, 16 môn, 12 phòng học (3 tòa × 4 lầu), 3 học kỳ (2 kỳ đã kết thúc có đủ điểm và kết quả qua/rớt, 1 kỳ hiện tại đang học giữa kỳ), 48 lớp, 1.800 lượt đăng ký, khoảng 22.800 lượt điểm danh. Dữ liệu sinh bằng mô phỏng cố định (cùng một kết quả mỗi lần), tỷ lệ rớt khoảng 17%. Hai học kỳ đã kết thúc là lịch sử để huấn luyện mô hình ML.
 
 | Role | Username | Mật khẩu |
 |---|---|---|
@@ -83,6 +83,21 @@ dotnet user-secrets set "Seed:AdminPassword" "<giống ADMIN_PASSWORD trong .env
 | Sinh viên | `SV001` … `SV120` | `DEMO_PASSWORD` |
 
 > Dữ liệu demo chỉ được tạo khi database **chưa có lớp học phần nào**. Nếu database cũ đã có dữ liệu thử và muốn tạo lại dữ liệu demo mới: `docker compose down -v` (⚠️ xóa toàn bộ database dev trong Docker) rồi `docker compose up -d --build`.
+
+## Cổng sinh viên và thống kê
+
+| Chức năng | Endpoint | Role |
+|---|---|---|
+| Thời khóa biểu hằng tuần (môn, thứ, tiết, giờ, phòng, **tòa, lầu**) | `GET /api/students/me/timetable?semesterId=` | Student |
+| Lịch học theo ngày (tuần này hoặc khoảng `from`–`to`) | `GET /api/students/me/schedule` | Student |
+| Điểm thi cuối kỳ và lịch thi (ngày, giờ, phòng) | `GET /api/students/me/exams?semesterId=` | Student |
+| Bảng điểm, GPA từng học kỳ, từng năm học và tích lũy | `GET /api/students/me/transcript` | Student |
+| Danh mục phòng học (tòa, lầu, sức chứa) | `GET/POST/PUT/DELETE /api/rooms` | đọc: mọi role; ghi: Admin |
+| Xếp lịch học và lịch thi cho lớp | trường `schedule` của `POST/PUT /api/sections` | Admin |
+| Xu hướng theo năm học, học kỳ (điểm TB, GPA TB, tỷ lệ đạt) | `GET /api/stats/trend` | Admin |
+| Tổng quan một học kỳ (phân bố điểm, GPA, rủi ro; theo môn, theo lớp) | `GET /api/stats/overview?semesterId=` | Admin |
+
+Quy ước: tiết 1 bắt đầu 07:00, mỗi tiết 45 phút, nghỉ 5 phút, tối đa 12 tiết/ngày; thứ 2–7 là 2–7, chủ nhật là 8. Năm học tính từ tháng 7 (học kỳ bắt đầu từ tháng 7 trở đi thuộc năm học `Y-(Y+1)`). Hệ thống chặn xếp trùng phòng hoặc trùng giảng viên cùng thứ, giao tiết (**409**).
 
 ## Luồng dự đoán nguy cơ rớt môn
 
@@ -98,9 +113,9 @@ Chi tiết ML service (thuật toán, API, cách chạy): [ml-service/README.md]
 
 | Bộ test | Lệnh | Nội dung |
 |---|---|---|
-| Test đơn vị .NET (42) | `dotnet test backend/DACN.Tests` | công thức điểm, quy đổi GPA, nhãn và gợi ý rủi ro |
+| Test đơn vị .NET (59) | `dotnet test backend/DACN.Tests` | công thức điểm, quy đổi GPA, nhãn và gợi ý rủi ro, quy ước tiết học và năm học |
 | Test ML service (41) | `cd ml-service && pytest tests -q` | huấn luyện, dự đoán, giải thích, tính đơn điệu, khóa API |
-| Test tích hợp API (328) | `python tests/api/test_*.py` (hệ thống đang chạy) | từng chức năng: đúng, sai, trùng, sai quyền; xem [tests/api/README.md](tests/api/README.md) |
+| Test tích hợp API (443) | `python tests/api/test_*.py` (hệ thống đang chạy) | từng chức năng: đúng, sai, trùng, sai quyền; xem [tests/api/README.md](tests/api/README.md) |
 
 ## Database & migration (backend)
 
