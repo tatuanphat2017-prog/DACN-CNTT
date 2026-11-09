@@ -62,7 +62,28 @@ check("Chuyên cần SV002 (A,A) = 0.00", 0.0, g["SV002"]["attendanceScore"])
 check("Chuyên cần SV003 (L,P) = 10×(0.5+1)/2 = 7.50", 7.5, g["SV003"]["attendanceScore"])
 check("Chuyên cần SV004 (E,P) = 10.00", 10.0, g["SV004"]["attendanceScore"])
 check("Số buổi vắng SV002 = 2", 2, g["SV002"]["absentCount"])
-check("PriorGpa chưa có lịch sử → null", None, g["SV001"]["priorGpa"])
+def grade_point(score):   # thang quy đổi của hệ thống: 8.5→4, 7→3, 5.5→2, 4→1, dưới 4→0
+    return 4.0 if score >= 8.5 else 3.0 if score >= 7 else 2.0 if score >= 5.5 else 1.0 if score >= 4 else 0.0
+
+
+def expected_gpa(token):
+    """GPA tích lũy tính lại từ kết quả thật của các học kỳ đã kết thúc, theo tín chỉ."""
+    credits = {c["name"]: c["credits"] for c in call("GET", "/courses?pageSize=100", token=admin)[1]["items"]}
+    current_name = call("GET", "/semesters/current", token=admin)[1]["name"]
+    points = weight = 0
+    for item in call("GET", "/students/me/sections", token=token)[1]:
+        if item["semesterName"] == current_name or item["totalScore"] is None:
+            continue
+        passed = call("GET", f"/students/me/sections/{item['sectionId']}", token=token)[1]["isPassed"]
+        points += (grade_point(item["totalScore"]) if passed else 0) * credits[item["courseName"]]
+        weight += credits[item["courseName"]]
+    return round(points / weight, 2) if weight else None
+
+
+sv_tokens = {code: login(code, ENV["DEMO_PASSWORD"]) for code in ("SV001", "SV002", "SV003", "SV004")}
+for code in ("SV001", "SV003"):
+    check(f"PriorGpa {code} = GPA tích lũy tính lại từ kết quả các học kỳ trước", expected_gpa(sv_tokens[code]), g[code]["priorGpa"])
+check("PriorGpa nằm trong khoảng 0–4", True, all(0 <= g[c]["priorGpa"] <= 4 for c in ("SV001", "SV002", "SV003", "SV004")))
 
 print("== Điểm danh: kiểm tra dữ liệu sai và quyền ==")
 check("Marks trùng sinh viên → 400", 400, call("PUT", f"/sections/{sec}/attendance/3", {"date": "2031-01-19", "marks": [{"enrollmentId": E1, "status": "Present"}, {"enrollmentId": E1, "status": "Absent"}]}, gv1)[0])

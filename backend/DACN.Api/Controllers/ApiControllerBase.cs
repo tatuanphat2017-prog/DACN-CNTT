@@ -14,6 +14,26 @@ public abstract class ApiControllerBase : ControllerBase
     protected ActionResult InvalidField(string field, string message) =>
         ValidationProblem(new ValidationProblemDetails(new Dictionary<string, string[]> { [field] = [message] }));
 
+    /// <summary>
+    /// Chạy một thao tác và chuyển lỗi nghiệp vụ thành ProblemDetails: ServiceException giữ mã của nó,
+    /// MlException 503 nghĩa là ML service không khả dụng, mã 4xx là ML service từ chối yêu cầu.
+    /// </summary>
+    protected async Task<IActionResult> RunAsync(Func<Task<IActionResult>> action)
+    {
+        try
+        {
+            return await action();
+        }
+        catch (ServiceException ex)
+        {
+            return Problem(statusCode: ex.Status, title: ex.Message);
+        }
+        catch (MlException ex)
+        {
+            return Problem(statusCode: ex.Status, title: ex.Message);
+        }
+    }
+
     /// <summary>Chuyển kết quả kiểm tra quyền lớp học phần thành 404/403. Trả null nếu được phép.</summary>
     protected IActionResult? Reject(SectionAccess access) => access.Status switch
     {

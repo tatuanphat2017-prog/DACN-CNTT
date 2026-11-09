@@ -26,7 +26,7 @@ public static class GradeScale
             return null;
         }
         var points = list.Sum(r => (r.Passed ? ToGradePoint(r.TotalScore) : 0m) * r.Credits);
-        return Math.Round(points / credits, 2);
+        return Math.Round(points / credits, 2, MidpointRounding.AwayFromZero);
     }
 }
 

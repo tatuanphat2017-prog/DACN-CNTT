@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="DACN.Api/DACN.Api.csproj" />
+  <Project Path="DACN.Tests/DACN.Tests.csproj" />
 </Solution>

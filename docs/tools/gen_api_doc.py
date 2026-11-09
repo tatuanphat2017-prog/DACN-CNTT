@@ -31,7 +31,6 @@ def main() -> None:
             by_tag[op["tags"][0]].append((method, path, op))
 
     total = sum(len(v) for v in by_tag.values())
-    mock = sum(1 for v in by_tag.values() for _, _, op in v if "**MOCK:**" in (op.get("description") or ""))
 
     lines = [
         "# Tài liệu API",
@@ -39,8 +38,7 @@ def main() -> None:
         "> File này sinh tự động từ `docs/api/openapi.json` bằng `docs/tools/gen_api_doc.py`. "
         "Chi tiết dữ liệu gửi/nhận xem trên Swagger (`/swagger`) của backend.",
         "",
-        f"**{total} endpoint**, trong đó **{mock} endpoint đang MOCK** (trả dữ liệu mẫu cố định, chưa có logic thật; "
-        "response có header `X-Mock-Data: true`). Endpoint không MOCK là đã chạy thật.",
+        f"**{total} endpoint**, tất cả đã có logic thật (dùng dữ liệu trong database).",
         "",
         "## Quy ước chung",
         "",
@@ -49,7 +47,7 @@ def main() -> None:
         "- **Enum dạng chữ:** `RiskLevel` = `Low` | `Medium` | `High`; `AttendanceStatus` = `Present` | `Absent` | `Late` | `Excused`.",
         "- **Phân trang:** `?page=1&pageSize=20`, kết quả `{ items, page, pageSize, totalItems }`.",
         "- **Ngày:** `DateOnly` dạng `yyyy-MM-dd`; thời gian là UTC dạng ISO 8601.",
-        "- **Lỗi:** 400 (dữ liệu sai, kèm chi tiết từng trường), 404 (không tìm thấy), 409 (trùng hoặc còn dữ liệu liên quan), 429 (đăng nhập sai quá nhiều), 503 (ML service không khả dụng).",
+        "- **Lỗi:** 400 (dữ liệu sai, kèm chi tiết từng trường), 403 (không đủ quyền với dữ liệu đó, ví dụ giảng viên xem lớp của người khác), 404 (không tìm thấy), 409 (trùng hoặc còn dữ liệu liên quan), 429 (đăng nhập quá 10 lần/phút), 503 (ML service không khả dụng).",
         "- **Mức rủi ro:** `Low` xác suất rớt < 0.3, `Medium` 0.3–0.6, `High` > 0.6.",
         "",
     ]
@@ -59,15 +57,14 @@ def main() -> None:
         ops = sorted(by_tag.get(tag, []), key=lambda x: (x[1], METHOD_ORDER.get(x[0], 9)))
         if not ops:
             continue
-        lines += [f"## {tag}", "", "| Method | Đường dẫn | Quyền | Mô tả | Mock |", "|---|---|---|---|---|"]
+        lines += [f"## {tag}", "", "| Method | Đường dẫn | Quyền | Mô tả |", "|---|---|---|---|"]
         for method, path, op in ops:
             summary = (op.get("summary") or "").replace("|", "\\|").replace("\n", " ")
-            is_mock = "✅" if "**MOCK:**" in (op.get("description") or "") else ""
-            lines.append(f"| `{method.upper()}` | `{path}` | {access(op.get('description'))} | {summary} | {is_mock} |")
+            lines.append(f"| `{method.upper()}` | `{path}` | {access(op.get('description'))} | {summary} |")
         lines.append("")
 
     open(OUT, "w", encoding="utf-8").write("\n".join(lines))
-    print(f"Đã tạo {OUT}: {total} endpoint, {mock} mock")
+    print(f"Đã tạo {OUT}: {total} endpoint")
 
 
 if __name__ == "__main__":
